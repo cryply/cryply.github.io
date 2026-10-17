@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Factory Method · Boris Ivanov</title>
+<meta name="description" content="1. Usage &quot;Define an interface for creating an object, but let subclasses decide which class to instantiate. The Factory method lets a class defer instantiation ">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Factory Method</h1>
+<p class="meta">Originally published 2016-02-14 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>"Define an interface for creating an object, but let subclasses decide which class to instantiate. The Factory method lets a class defer instantiation it uses to subclasses."(Gang Of Four)</p>
+<h3>2. UML class diagram</h3>
+<p><a href="../../../wp-content/uploads/2016/02/FactoryMethodHierarchy.png" rel="attachment wp-att-292"><img class="alignnone size-full wp-image-292" src="../../../wp-content/uploads/2016/02/FactoryMethodHierarchy.png" alt="FactoryMethodHierarchy" /></a></p>
+<h3>3. Pros</h3>
+<p>- client can create objects <em>without specifying subclass types</em>.</p>
+<h3>4. Cons</h3>
+<p>- hard to refactor existing code.<br />
+- if abstract class need to be extended all sub-classes must be extended also.</p>
+<p>Difference to Abstract Factory:<br />
+- Factory Method used to create One type of Product but Abstract Factory about creation of families of related or dependent products;<br />
+- Factory Method expose Method to client for creating product while Abstract  Factory expose family of related objects which consist of many Factory Methods;</p>
+<p>&nbsp;</p>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+
+// Pizza factory example from
+// http://en.wikipedia.org/wiki/Factory_method_pattern
+
+#include &amp;amp;lt;string&amp;amp;gt;
+#include &amp;amp;lt;iostream&amp;amp;gt;
+#include &amp;amp;lt;memory&amp;amp;gt; // std::auto_ptr
+class Pizza {
+public:
+    virtual void get_price() const = 0;
+    virtual ~Pizza() {};
+};
+ 
+class HamAndMushroomPizza: public Pizza {
+public:
+    virtual void get_price() const {
+        std::cout &amp;amp;lt;&amp;amp;lt; &quot;Ham and Mushroom: $8.5&quot; &amp;amp;lt;&amp;amp;lt; std::endl;
+    }
+};
+ 
+class DeluxePizza : public Pizza {
+public:
+    virtual void get_price() const {
+        std::cout &amp;amp;lt;&amp;amp;lt; &quot;Deluxe: $10.5&quot; &amp;amp;lt;&amp;amp;lt; std::endl;
+    }
+};
+ 
+class HawaiianPizza : public Pizza {
+public:
+    virtual void get_price() const {
+        std::cout &amp;amp;lt;&amp;amp;lt; &quot;Hawaiian: $11.5&quot; &amp;amp;lt;&amp;amp;lt; std::endl;
+    }
+};
+ 
+class PizzaFactory {
+public:
+    static Pizza* create_pizza(const std::string&amp;amp;amp; type) {
+        if (type == &quot;Ham and Mushroom&quot;)
+            return new HamAndMushroomPizza();
+        else if (type == &quot;Hawaiian&quot;)
+            return new HawaiianPizza();
+        else
+            return new DeluxePizza();
+    }
+};
+
+//usage
+int main() {
+    PizzaFactory factory;
+ 
+    std::auto_ptr&amp;amp;lt;const Pizza&amp;amp;gt; pizza(factory.create_pizza(&quot;Default&quot;));
+    pizza-&amp;amp;gt;get_price();
+ 
+    pizza.reset(factory.create_pizza(&quot;Ham and Mushroom&quot;));
+    pizza-&amp;amp;gt;get_price();
+ 
+    pizza.reset(factory.create_pizza(&quot;Hawaiian&quot;));
+    pizza-&amp;amp;gt;get_price();
+}
+
+/*Output:
+Deluxe: $10.5
+Ham and Mushroom: $8.5
+Hawaiian: $11.5
+*/</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

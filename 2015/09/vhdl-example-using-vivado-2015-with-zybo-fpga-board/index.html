@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VHDL example using VIVADO 2015  with ZYBO FPGA board · Boris Ivanov</title>
+<meta name="description" content="Aim I am FPGA novice and want to try classical FPGA design tutorials. I bought perfect modern FPGA board ZYBO ( ZY nq BO ard) based on Xilinx Z-7010 from Digile">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>VHDL example using VIVADO 2015  with ZYBO FPGA board</h1>
+<p class="meta">Originally published 2015-09-29 · Boris Ivanov</p>
+<div class="clarify-article-content">
+<div class="clarify-steps-container">
+<div id="clarify-step-22" class="clarify-step-container">
+<h3 class="clarify-step-title">Aim</h3>
+<div class="clarify-step-instructions">
+<p>&nbsp;</p>
+<p>I am FPGA novice and want to try classical FPGA design tutorials. I bought perfect modern FPGA board ZYBO (<strong>ZY</strong>nq <strong>BO</strong>ard) based on Xilinx Z-7010 from Digilent but latest tools from Xilinx VIVADO 2015.2 more focused on AP SoC programming while I want to just pure FPGA design without any linuxes bootloaders etc. So I wrote this tutorial to help people like me :)</p>
+<p>In this example we make simple scheme: 2 signals IN and 4 OUT.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/aim1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-14" class="clarify-step-container">
+<h3 class="clarify-step-title">Preconditions: Adding Zybo Board to Vivado</h3>
+<div class="clarify-step-instructions">
+<p>Vivado 2015.2 under Windows 7 64 bit was used with 16 GB of RAM.</p>
+<p>Before using Zybo with Vivado you should add Zybo Definitions File to Vivado.</p>
+<p>1. Good source for Board Definition files is <a href="http://www.zynqbook.com/" target="">Zynqbook website</a>.Download <a href="http://www.zynqbook.com/getDownload.php?req=2" target="">The_Zynq_Book_Tutorial_Sources_Aug15.zip</a></p>
+<p>2. Copy <strong>zybo</strong> folder with content from Archive path <strong>\sources\zybo\setup\board_part</strong> into D:\Xilinx\Vivado\2015.2\<strong>data\boards\board_files</strong> (if D:\Xilinx\Vivado\2015.2 is my PC you probably have C:\Xilinx etc...)</p>
+<p>3. In board_files you should see other boards so now our Zybo known by Vivado.</p>
+<p>4. Download  <a href="http://digilentinc.com/Data/Products/ZYBO/ZYBO_Master_xdc.zip" target="">ZYBO_Master.xdc from Digilent website</a> unpack constraints file it on local hard disk.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/preconditions-adding-zybo-board-to-vivado1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-1" class="clarify-step-container">
+<h3 class="clarify-step-title">Phase 1. Preparation.</h3>
+<div class="clarify-step-instructions">
+<p>I have latest Vivado Design Edition from Xilinx which comes with Digilent Zybo board.</p>
+<p>Launch your Vivado.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/phase-1-preparation.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-2" class="clarify-step-container">
+<h3 class="clarify-step-title">Create new project</h3>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/create-new-project1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-3" class="clarify-step-container">
+<h3 class="clarify-step-title">New Project</h3>
+<div class="clarify-step-instructions">
+<p>Click Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/new-project1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-4" class="clarify-step-container">
+<h3 class="clarify-step-title">Set project name.</h3>
+<div class="clarify-step-instructions">
+<p>Set project name to <strong>gates2</strong>,</p>
+<p>Keep rest settings unchanged unless you know what you doing.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/set-project-name-1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-5" class="clarify-step-container">
+<h3 class="clarify-step-title">Project Type</h3>
+<div class="clarify-step-instructions">
+<p>Keep default RTL(Register Transfer Level) project, Press Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/project-type1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-6" class="clarify-step-container">
+<h3 class="clarify-step-title">Add sources</h3>
+<div class="clarify-step-instructions">
+<p>In this tutorial we decided to use VHDL language so make sure it set correctly. Simulator language you can keep unchanged.</p>
+<p>Click on "+" - Select - Create File.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/add-sources1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-7" class="clarify-step-container">
+<h3 class="clarify-step-title">Create Source File</h3>
+<div class="clarify-step-instructions">
+<p>Set Filename to <strong>gates2</strong>. Keep the rest unchaged. Press OK. Press Next.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/create-source-file1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-8" class="clarify-step-container">
+<h3 class="clarify-step-title">Add Existing IP</h3>
+<div class="clarify-step-instructions">
+<p>Click Next.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/add-existing-ip1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-10" class="clarify-step-container">
+<h3 class="clarify-step-title">Add Constraints</h3>
+<div class="clarify-step-instructions">
+<p>Click "+", Add Files.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/add-constraints1.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-11" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Add Constraint file we downloaded at Precondition step(You have to restart Vivado to see ZYBO board).</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/d6f6f681-9087-4bdd-8770-92d269f737971.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-12" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Make sure: Copy constraints files into project - Checked.</p>
+<p>Click - Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/9f71c53b-3f25-432f-9a0a-56b59643fea11.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-13" class="clarify-step-container">
+<h3 class="clarify-step-title">Default Part</h3>
+<div class="clarify-step-instructions">
+<p>Click on boards and select Zybo. If you still dont have it follow steps in Preconditions: Adding Zybo board to Vivado.</p>
+<p>If you dont see ZYBO goto Preconditions Step.</p>
+<p>Next.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/default-part1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-15" class="clarify-step-container">
+<h3 class="clarify-step-title">New Project Summary</h3>
+<div class="clarify-step-instructions">
+<p>Finish</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/new-project-summary1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-16" class="clarify-step-container">
+<h3 class="clarify-step-title">Phase 2. Editing Project</h3>
+<div class="clarify-step-instructions">
+<p>Project files generated and ready for your design.</p>
+<p>We will implement 2 input gates and 4 output basic gates <strong>and</strong>, <strong>or</strong>,  <strong>xor and  nor. </strong></p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/phase-2-editing-project-.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-17" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Define I/O ports as below</p>
+<p>OK</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/498947d1-16f9-4b30-baaa-f78a56a0b2ee1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-18" class="clarify-step-container">
+<h3 class="clarify-step-title">Select VHDL Design</h3>
+<div class="clarify-step-instructions">
+<p>Click on Source file in Project Manager&gt;Sources&gt;Design Sources - Source code on Righthand side should appear.</p>
+<p>&nbsp;</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/select-vhdl-design1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-19" class="clarify-step-container">
+<h3 class="clarify-step-title">Changes to source code.</h3>
+<div class="clarify-step-instructions">
+<p>Modify VHDL file - add lines as highlighted below.</p>
+<pre><code class="language-vhdl">
+z(0) &lt;= a and b;
+z(1) &lt;= a or b;
+z(2) &lt;= a xor b;
+z(3) &lt;= a nor b;</code></pre>
+<p>&nbsp;</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/changes-to-source-code1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-21" class="clarify-step-container">
+<h3 class="clarify-step-title">Create top file</h3>
+<div class="clarify-step-instructions">
+<p>Rightclick on Design Sources and select Add Sources.</p>
+<p>1. Add or create design souces.</p>
+<p>2. "+" &gt; Create File</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/create-top-file1.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-41" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>File Type :VHDL,</p>
+<p>File name: top_gates2</p>
+<p>OK</p>
+<p>Finish</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/b1ee06cd-09c2-4167-aa4a-128e2b14e5941.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-42" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Define Module</p>
+<p>Add sw and led as on image below.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/9b05d3aa-ca9c-4d68-9278-3c57324be5541.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-23" class="clarify-sub-step-container">
+<h4 class="clarify-step-title"></h4>
+<h4 class="clarify-step-title">Replace default source code.</h4>
+</div>
+<pre><code class="language-vhdl">
+library IEEE;
+ use IEEE.STD_LOGIC_1164.ALL;
+ entity top_gates2 is
+ Port (
+  sw : in STD_LOGIC_VECTOR (1 downto 0);
+  led : out STD_LOGIC_VECTOR (3 downto 0)
+ );
+ end top_gates2;
+ architecture top_gates2 of top_gates2 is
+ component gates2 is
+ Port (
+  a : in STD_LOGIC;
+  b : in STD_LOGIC;
+  z : out STD_LOGIC_VECTOR (3 downto 0)
+ );
+ end component;
+ 
+begin
+ cl : gates2
+ port map (
+  a =&gt; sw(0),
+  b =&gt; sw(1),
+  z(0) =&gt; led(0),
+  z(1) =&gt; led(1),
+  z(2) =&gt; led(2),
+  z(3) =&gt; led(3)
+ );
+ end top_gates2;</code></pre>
+<p><!--more--></p>
+<p><!--more--></p>
+<div class="clarify-step-image-container"></div>
+<div class="clarify-article-content">
+<div class="clarify-steps-container">
+<div id="clarify-step-21" class="clarify-step-container">
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-23" class="clarify-sub-step-container">
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/replace-default-source-code1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-43" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">Top Design</h4>
+<div class="clarify-step-instructions">
+<p>We have single top design interface file which use our gates2 design as component.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/top-design1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-24" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">top design</h4>
+<div class="clarify-step-instructions">
+<p>Make sure our top file became parent of gates2 file. Otherwise set it manually with <strong>Set as Top</strong>.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/top-design-11.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-25" class="clarify-step-container">
+<h3 class="clarify-step-title">Amend Constraints file</h3>
+<div class="clarify-step-instructions">
+<p>Select xdc file from Sources&gt;Constraints</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/amend-constraints-file1.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-26" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">Changes in xdc file</h4>
+<div class="clarify-step-instructions">
+<p>Uncomment lines of I/O ports we need to use.</p>
+<p>Save file.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/changes-in-xdc-file1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-20" class="clarify-step-container">
+<h3 class="clarify-step-title">Phase 3  - Synthesis and uploading to device.</h3>
+<div class="clarify-step-instructions">
+<p>At Synthesis phase we convert our circuit from register transfer level (RTL) into  a design implementation in terms of logic gates.</p>
+<p>In Flow Navigator on Lefthand side.:</p>
+<p>Next steps can be <strong>Simulation</strong>&gt;<strong>Run Simulation</strong> or <strong>RTL Analysis&gt;Schematic</strong> but we skip them in this tutorial and come directly to<strong> Synthesis&gt;Run Synthesis</strong>.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/phase-3-synthesis-and-uploading-to-device.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-27" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">Synthesis complention</h4>
+<div class="clarify-step-instructions">
+<p>Leave default Run Implementation</p>
+<p>OK</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/synthesis-complention1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-28" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">Generate Bitstream</h4>
+<div class="clarify-step-instructions">
+<p>Select Generate Bitstream</p>
+<p>OK</p>
+<p>&nbsp;</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/generate-bitstream1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-30" class="clarify-step-container">
+<h3 class="clarify-step-title">Final</h3>
+<div class="clarify-step-instructions">
+<p>Pay attention to jumpers.</p>
+<p>JP7 - It should set to USB.</p>
+<p>JP5 can be JTAG or QSPI</p>
+<p>Connect ZYBO to PC with Micro-USB cable.</p>
+<p>Photo taken from <a href="http://marsee101.blog19.fc2.com/blog-entry-2745.html">http://marsee101.blog19.fc2.com/blog-entry-2745.html</a></p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/final1.png" alt="" /></div>
+</div>
+<div class="clarify-sub-steps-container">
+<div id="clarify-step-29" class="clarify-sub-step-container">
+<h4 class="clarify-step-title">Program ZYBO</h4>
+<div class="clarify-step-instructions">
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/program-zybo1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-31" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/65ffa6f5-7524-4399-b991-f582e0b8467f1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-32" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/dbff1512-09c7-4486-a0c7-96d27d0213fc1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-33" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Make sure you have similar setting like on picture below.</p>
+<p>Select xc7z010_1</p>
+<p>Next</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/ba7b476e-a7c0-4314-a491-dd8c408074171.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-34" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Finish</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/2acd80e5-6be3-48a9-8eae-bae68cf2f4841.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-35" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Program device &gt; xc7z010_1</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/5532b3a5-90d9-4827-953e-8692dbac89dd1.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-36" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Program</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/a4c4edeb-eea6-465f-811d-58cb120300551.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-37" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>As confirmation of successfull upload Greed Led will set</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/575d520a-fe99-4180-a1af-6e26257b21001.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-38" class="clarify-sub-step-container">
+<div class="clarify-step-instructions">
+<p>Use switches to confirm <strong>and</strong>, <strong>or</strong>, <strong>xor</strong> and <strong>nor</strong> operations.</p>
+<p>Archive of project <a href="../../../files/gates2.xpr.zip" target="">available</a>.</p>
+<p>PDF version of this lesson <a href="../../../fpga/vhdlzybo1.pdf" target="">available</a>.</p>
+</div>
+<div class="clarify-step-image-wrapper">
+<div class="clarify-step-image-container"><img class="clarify-step-image" src="../../../wp-content/uploads/2015/09/4547cdfb-e9d4-4daf-904c-b041830cf7571.png" alt="" /></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-39" class="clarify-step-container">
+<h3 class="clarify-step-title">Reference</h3>
+<div class="clarify-step-instructions">
+<p>1. Digital Design  Using Digilent FPGA Boards VHDL/ Active-HDL edition. Richard E. Haskell, Darrin M. Hanna</p>
+<p>2. Learning By Example Using VHDL. Advanced Digital Design With a NEXYS 2 FPGA Board. Richard E. Haskell, Darrin M. Hanna</p>
+<p>3. <a href="http://zynqbook.com/" target="">The ZYNQ BOOK</a> - Make sure you download not only book archive but also tutorials book with sources.</p>
+<p>4. HDL Chip Design- A Practical Guide for Designing, Synthesizing and Simulating ASICs and FPGAs Using VHDL or Verilog. By Douglas J. Smith</p>
+<p>5. <a href="http://www.digilentinc.com/data/products/zybo/zybo_rm_b_v6.pdf" target="">ZYBO Reference Manual</a></p>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-9" class="clarify-step-container">
+<h3 class="clarify-step-title">Files</h3>
+<div class="clarify-step-instructions">
+<p>1. <a href="../../../files/gates2.xpr.zip" target="">Project Archive</a></p>
+<p>2. <a href="http://www.zynqbook.com/getDownload.php?req=2" target="">ZYBO Board Definition File.</a></p>
+<p>3. <a href="http://digilentinc.com/Data/Products/ZYBO/ZYBO_Master_xdc.zip" target="">ZYBO Master xdc file.</a></p>
+</div>
+</div>
+<div class="clarify-clear"></div>
+<div id="clarify-step-40" class="clarify-step-container">
+<h3 class="clarify-step-title">Feedback</h3>
+<div class="clarify-step-instructions">
+<p>boris@borisivanov.com</p>
+</div>
+</div>
+<div class="clarify-clear"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</article>
+<section class="comments">
+<h2>Comments (9)</h2>
+<div class="comment"><div class="who">Andrew Smith · 2015-10-11</div><p>Hello,</p>
+<p>Thank you for this VHDL example. It has been very useful.</p>
+<p>Andrew</p></div>
+<div class="comment reply"><div class="who">Boris Ivanov · 2015-10-12</div><p>You welcome!</p></div>
+<div class="comment"><div class="who">JT · 2015-11-16</div><p>I get a failed Synthesis...<br />
+[Synth 8-2321] mismatch on label ; expected behavioral [&quot;C:/~~~/Xilinx/Projects/lab/gates2/gates2.srcs/sources_1/new/top_gates2.vhd&quot;:59]</p>
+<p>However I dont see what I have done wrong..<br />
+ );<br />
+ end component;</p>
+<p>begin<br />
+ cl : gates2<br />
+ port map (<br />
+  a =&amp;gt; sw(0),<br />
+  b =&amp;gt; sw(1),<br />
+  z(0) =&amp;gt; led(0),<br />
+  z(1) =&amp;gt; led(1),<br />
+  z(2) =&amp;gt; led(2),<br />
+  z(3) =&amp;gt; led(3)<br />
+ );<br />
+ end top_gates2;</p></div>
+<div class="comment"><div class="who">JT · 2015-11-16</div><p>Apologies...I think I was too quick to ask. I found I had not changed the name for the architecture. Thanks the tutorial is wonderful</p></div>
+<div class="comment reply"><div class="who">BorisIvanov · 2015-12-19</div><p>Thank you!</p></div>
+<div class="comment"><div class="who">Don · 2016-03-23</div><p>Good work! Very useful. Do you have any more examples like ZYBO interfacing with external units such as 7 segment display, motors, cameras, etc.<br />
+Keep up the good works!</p></div>
+<div class="comment reply"><div class="who">Boris Ivanov · 2016-03-26</div><p>Thanks for feedback!<br />
+Here article about basic PMOD: http://borisivanov.com/index.php/2015/12/28/using-digilents-pmod8ld-with-zybo-fpga-board-2/</p>
+<p>Soon I will publish mini project with 7 Segments PMOD and probably VGA.</p></div>
+<div class="comment"><div class="who">yuri · 2016-10-20</div><p>Great work! Thank you! I will use Zybo in my thesis and your guide is actually the best for beginning!</p></div>
+<div class="comment reply"><div class="who">Boris Ivanov · 2016-10-22</div><p>You welcome! Zybo is great.</p></div>
+</section>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

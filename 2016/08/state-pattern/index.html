@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>State Pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Allow an object to change behavior when State changed. implements OOP Final State Machine(FSM) 2. UML class diagram Context is wrapper class - interfac">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>State Pattern</h1>
+<p class="meta">Originally published 2016-08-15 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ul>
+<li>Allow an object to change behavior when State changed.</li>
+<li>implements OOP Final State Machine(FSM)</li>
+</ul>
+<h3>2. UML class diagram</h3>
+<p><a href="../../../wp-content/uploads/2016/05/state.gif"><img src="../../../wp-content/uploads/2016/05/state.gif" alt="state" class="alignnone size-full wp-image-589" /></a></p>
+<ul>
+<li>Context is wrapper class - interface to state</li>
+<li>Define abstract state base class</li>
+<li>Define state specific behavior in derived state classes</li>
+<li>maintain pointer to current state in wrapper context class</li>
+</ul>
+<h3>3. Pros</h3>
+<ul>
+<li>Easier to extend with new states by adding a new object</li>
+<li>Easier to assure that all signals are treated by the states, since the base class should define the signals as abstract functions.</li>
+<li>Easier to extend a particular states behavior by deriving from the state. The state pattern should put a particular states behavior in one object.</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>More difficult to see all states and their relations by looking at code, since they are dispersed among several different classes.</li>
+<li>Could end up creating an unmanageable number of objects. But compare this to the corresponding if/else blocks needed with the corresponding ENUM solution.</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+/*
+From https://sourcemaking.com/design_patterns/state/cpp/1
+*/
+#include &lt;iostream&gt;
+using namespace std;
+
+class Machine
+{
+  class State *current;
+  public:
+    Machine();
+    void setCurrent(State *s)
+    {
+        current = s;
+    }
+    void on();
+    void off();
+};
+
+class State
+{
+  public:
+    virtual void on(Machine *m)
+    {
+        cout &lt;&lt; &quot;   already ON\n&quot;;
+    }
+    virtual void off(Machine *m)
+    {
+        cout &lt;&lt; &quot;   already OFF\n&quot;;
+    }
+};
+
+void Machine::on()
+{
+  current-&gt;on(this);
+}
+
+void Machine::off()
+{
+  current-&gt;off(this);
+}
+
+class ON: public State
+{
+  public:
+    ON()
+    {
+        cout &lt;&lt; &quot;   ON-ctor &quot;;
+    };
+    ~ON()
+    {
+        cout &lt;&lt; &quot;   dtor-ON\n&quot;;
+    };
+    void off(Machine *m);
+};
+
+class OFF: public State
+{
+  public:
+    OFF()
+    {
+        cout &lt;&lt; &quot;   OFF-ctor &quot;;
+    };
+    ~OFF()
+    {
+        cout &lt;&lt; &quot;   dtor-OFF\n&quot;;
+    };
+    void on(Machine *m)
+    {
+        cout &lt;&lt; &quot;   going from OFF to ON&quot;;
+        m-&gt;setCurrent(new ON());
+        delete this;
+    }
+};
+
+void ON::off(Machine *m)
+{
+  cout &lt;&lt; &quot;   going from ON to OFF&quot;;
+  m-&gt;setCurrent(new OFF());
+  delete this;
+}
+
+Machine::Machine()
+{
+  current = new OFF();
+  cout &lt;&lt; \n;
+}
+
+int main()
+{
+  void(Machine::*ptrs[])() =  { Machine::off, Machine::on };
+
+  Machine fsm;
+  int num;
+  while (1)
+  {
+    cout &lt;&lt; &quot;Enter 0/1: &quot;;
+    cin &gt;&gt; num;
+    (fsm.*ptrs[num])();
+  }
+}
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

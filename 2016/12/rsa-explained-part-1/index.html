@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RSA - explained. Part 1. · Boris Ivanov</title>
+<meta name="description" content="RSA a milestone in cryptography, was first published by Ron Rivest, Adi Shamir and Leonard Adleman (MIT) in 1977. Their work based heavily on idea of asymmetric">
+<link rel="stylesheet" href="../../../style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js" onload="renderMathInElement(document.body,{delimiters:[{left:String.fromCharCode(92)+String.fromCharCode(40),right:String.fromCharCode(92)+String.fromCharCode(41),display:false}],throwOnError:false})"></script>
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>RSA - explained. Part 1.</h1>
+<p class="meta">Originally published 2016-12-28 · Boris Ivanov</p>
+<p>RSA a milestone in cryptography, was first published by Ron Rivest, Adi Shamir and Leonard Adleman (MIT) in 1977. Their work based heavily on idea of asymmetric public-private key cryptosystem published in 1976 by Whitfield Diffie and Martin Hellman (Stanford).</p>
+<p>Here I try to make simple explanation of that cipher (not to pretend I am an expert in subject more to remember myself):</p>
+<ol>
+<li>Lets take primes <span class="math">\(p\)</span> and <span class="math">\(q\)</span>.</li>
+<li>Then calculate modulus <span class="math">\(n=p \cdot q\)</span>.</li>
+<li>Calculate <a href="https://en.wikipedia.org/wiki/Euler%27s_totient_function">Eulers totient function</a> <span class="math">\(\phi(n)\)</span> - it is equal to amount of positive integers <a href="https://en.wikipedia.org/wiki/Coprime_integers">relatively prime</a> to <span class="math">\(n\)</span>.
+<span class="math">\(\phi(9)=6\)</span> , as there 6 co-prime numbers to 9 : [1, 2, 4, 5, 7, 8]. <span class="math">\(\phi(n)\)</span> is kept private.
+<span class="math">\(\phi(n)=\phi(p)\phi(q)=(p-1)(q-1)\)</span> - as p and q prime and amount of co-primes is p-1 and q-1.</li>
+<li>Take <span class="math">\(e\)</span> such as <span class="math">\(1 &lt; e &lt; \phi(n)\)</span> and <a href="https://en.wikipedia.org/wiki/Greatest_common_divisor">gcd</a>(<span class="math">\( e, \phi(n)\)</span> ) = 1. Which means <span class="math">\( e, \phi(n)\)</span> are co-prime.  It will be our public key</li>
+<li>Our task at this point to use <a href="https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm">extended Euclidean algorithm(EEA)</a> to calculate inversion by <a href="https://en.wikipedia.org/wiki/Modular_arithmetic">modulo </a><span class="math">\(\phi(n)\)</span>. Such as :
+<ol>
+<li> <span class="math">\(ed\equiv1\)</span> mod  <span class="math">\( \phi(n)\)</span> . From other side EEA calculates x and y such as</li>
+<li><span class="math">\(ax + by=gcd(a,b)\)</span>.  Now lets say
+<span class="math">\(a=e\)</span> and <span class="math">\(b=\phi(n)\)</span> and <span class="math">\(gcd(e,\phi(n))=1\)</span> (as they co-prime by definition). Then we have</li>
+<li><span class="math">\(ex+\phi(n)y=1\)</span> and after we take modulo <span class="math">\(\phi(n)\)</span> on both side and we get</li>
+<li><span class="math">\(ex \equiv 1\)</span> mod(<span class="math">\(\phi(n)\)</span>)This x we call d and it represent private key.
+f.e. <span class="math">\(\phi(n)\)</span>=3120, <span class="math">\(e\)</span>=17 then by EED <span class="math">\(d\)</span>=2753, 2753*17 mod 3120 = 1</li>
+</ol>
+</li>
+<li><span class="math">\((e,n)\)</span> -  Public Key.(<span class="math">\(d\)</span>) - private key.</li>
+<li>Main idea of RSA is <span class="math">\((m^{e})^{d}\equiv m\)</span>  <span class="math">\(mod(n)\)</span> - if you know <span class="math">\(e,n\)</span> or <span class="math">\(m\)</span> its very hard to find <span class="math">\(d\)</span>.</li>
+<li>Encryption : <span class="math">\(c\equiv m^{e}\)</span> <span class="math">\(mod (n)\)</span> where <span class="math">\(0\leq m &lt; n\)</span> and <span class="math">\(gcd(m,n)=1\)</span></li>
+<li>Decryption : <span class="math">\(c^{d} \equiv (m^{e})^{d}\equiv m\)</span> (mod n)</li>
+</ol>
+<p>&nbsp;</p>
+<p>As you can see RSA can be used only for encryption of small messages. To encrypt big chunks of data used hybrid schemes. RSA used for encryption of key which will be used by symmetric cipher like IDEA/AES.</p>
+<p>By Boris Ivanov</p>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

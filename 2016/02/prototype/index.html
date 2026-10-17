@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prototype · Boris Ivanov</title>
+<meta name="description" content="1. Usage Pool of prototypical instances copying them-self to create new copy of objects. Reason can be expensive usage of new() command. Also such approach hide">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Prototype</h1>
+<p class="meta">Originally published 2016-02-20 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>Pool of prototypical instances copying them-self to create new copy of objects. Reason can be expensive usage of new() command. Also such approach hide complexity.</p>
+<h3>2. UML class diagram</h3>
+<p><a href="../../../wp-content/uploads/2016/02/prototype2.png" rel="attachment wp-att-329"><img class="alignnone size-full wp-image-329" src="../../../wp-content/uploads/2016/02/prototype2.png" alt="prototype2" /></a></p>
+<h3>3. Pros</h3>
+<ul>
+<li>Adding and removing products at run-time.</li>
+<li>Specifying new objects by varying values.</li>
+<li>Specifying new objects by varying structure.</li>
+<li>Reduced sub-classing.</li>
+<li>Configuring an application with classes dynamically.</li>
+</ul>
+<h3>4. Cons</h3>
+<p>Each subclass of Prototype must implement Clone operation, which may be difficult.(internals include objects which dont support copying or have circular references).</p>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+/**********************
+ 2016 (C) Boris Ivanov.
+ Prototype Design Pattern 
+ C++ implementation
+ ********************/
+
+#include &lt;iostream&gt;
+
+using namespace std;
+
+
+// Abstract class.
+class ProtoSheep{
+
+protected:
+    string _name;
+    int _age;
+
+public:
+    virtual ProtoSheep* clone () = 0;
+    string getName(){
+        return _name;
+    }
+
+    int getAge(){
+        return _age;
+    }
+};
+
+
+// Concrete class.
+class BlackSheep : public ProtoSheep{
+public:
+    BlackSheep(int age, string name){
+        _name = name;
+        _age = age;
+    }
+
+    ProtoSheep* clone(){
+        // Default Constructor used.
+        return new BlackSheep(*this);
+    }
+};
+
+
+// Factory to manage prototypes and clone them.
+class SheepFactory
+{
+    static ProtoSheep* sheep;
+
+public:
+    static void Init(){
+        sheep = new BlackSheep(3, &quot;Blacky&quot;);
+    }
+
+    static ProtoSheep* CloneBlackSheep(){
+        return sheep-&gt;clone();
+    }
+
+};
+
+// Linker need to have it outside class declaration.
+ProtoSheep * SheepFactory::sheep = 0;
+
+int main()
+{
+    ProtoSheep * Dolly;
+    ProtoSheep * Dolly2;
+
+    SheepFactory::Init();
+
+    Dolly = SheepFactory::CloneBlackSheep();
+    Dolly2 = SheepFactory::CloneBlackSheep();
+    cout &lt;&lt; Dolly-&gt;getName() &lt;&lt; &quot;:&quot; &lt;&lt; Dolly-&gt;getAge() &lt;&lt; &quot;\n&quot;;
+    cout &lt;&lt; Dolly2-&gt;getName() &lt;&lt; &quot;:&quot; &lt;&lt; Dolly2-&gt;getAge() &lt;&lt; &quot;\n&quot;;
+    return 0;
+}
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

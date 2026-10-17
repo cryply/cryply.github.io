@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bridge · Boris Ivanov</title>
+<meta name="description" content="1. Usage Kind of &quot;2D Abstraction&quot; (or by Rumbaugh &quot;nested generalizations&quot;) both on Interface(Window in example below) and on Implementation(WindowImp). So both">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Bridge</h1>
+<p class="meta">Originally published 2016-03-03 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>
+Kind of "2D Abstraction" (or by Rumbaugh "nested generalizations") both on Interface(Window in example below) and on Implementation(WindowImp). So both Abstraction and Implementation should be extensible by sub-classing.Another name for this pattern is <strong>Handle-Body</strong>.This Pattern often used in Window Libraries e.g. AWT. Qt library uses this pattern for switching Style at run-time.
+<p><strong>Reasons for pattern: </strong></p>
+<ul>
+<li>avoid binding between abstraction and implementation, </li>
+<li>changes in implementation should not affect client - no compile time dependancy</li>
+<li>ability to extend the Abstraction and Implementor hierarchies independently</li>
+</ul>
+</p>
+<h3>2. UML class diagram</h3>
+<p><img src="http://www.cs.unc.edu/~stotts/GOF/hires/Pictures/bridg100.gif" alt="Bridge Design Pattern" /><br />
+<em>(Source: <a href="http://www.cs.unc.edu/~stotts/GOF/hires/pat4bfso.htm" target="_blank">http://www.cs.unc.edu/~stotts/GOF/hires/pat4bfso.htm</a>)</em></p>
+<h3>3. Pros</h3>
+<ul>
+<li>Changes in implementation not affect clients/decoupling of implementation from interface</li>
+<li>improved extensibility of classes</li>
+<li>Hiding implementation details from clients</li>
+</ul>
+<h3>4. Cons(implementation issue)</h3>
+<ul>
+<li>abstraction has only one implementation</li>
+<li>creating right implementor</li>
+<li>sharing implementors</li>
+<li>use multiple inheritance</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+
+// From http://www.cs.unc.edu/~stotts/GOF/hires/pat4bfso.htm
+  class Window {
+    public:
+        Window(View* contents);
+    
+        // requests handled by window
+        virtual void DrawContents();
+    
+        virtual void Open();
+        virtual void Close();
+        virtual void Iconify();
+        virtual void Deiconify();
+    
+        // requests forwarded to implementation
+        virtual void SetOrigin(const Point&amp; at);
+        virtual void SetExtent(const Point&amp; extent);
+        virtual void Raise();
+        virtual void Lower();
+    
+        virtual void DrawLine(const Point&amp;, const Point&amp;);
+        virtual void DrawRect(const Point&amp;, const Point&amp;);
+        virtual void DrawPolygon(const Point[], int n);
+        virtual void DrawText(const char*, const Point&amp;);
+    
+    protected:
+        WindowImp* GetWindowImp();
+        View* GetView();
+    
+    private:
+        WindowImp* _imp;
+        View* _contents; // the windows contents
+    };
+//Window maintains a reference to a WindowImp, the abstract class that declares an interface to the underlying windowing system.
+
+     class WindowImp {
+    public:
+        virtual void ImpTop() = 0;
+        virtual void ImpBottom() = 0;
+        virtual void ImpSetExtent(const Point&amp;) = 0;
+        virtual void ImpSetOrigin(const Point&amp;) = 0;
+    
+        virtual void DeviceRect(Coord, Coord, Coord, Coord) = 0;
+        virtual void DeviceText(const char*, Coord, Coord) = 0;
+        virtual void DeviceBitmap(const char*, Coord, Coord) = 0;
+        // lots more functions for drawing on windows...
+    protected:
+        WindowImp();
+    };
+//Subclasses of Window define the different kinds of windows the application might use, such as application windows, icons, //transient windows for dialogs, floating palettes of tools, and so on.
+//For example, ApplicationWindow will implement DrawContents to draw the View instance it stores:
+
+     class ApplicationWindow : public Window {
+    public:
+        // ...
+        virtual void DrawContents();
+    };
+    
+    void ApplicationWindow::DrawContents () {
+        GetView()-&gt;DrawOn(this);
+    }
+
+//IconWindow stores the name of a bitmap for the icon it displays...
+
+     class IconWindow : public Window {
+    public:
+        // ...
+        virtual void DrawContents();
+    private:
+        const char* _bitmapName;
+    };
+//...and it implements DrawContents to draw the bitmap on the window:
+
+     void IconWindow::DrawContents() {
+        WindowImp* imp = GetWindowImp();
+        if (imp != 0) {
+            imp-&gt;DeviceBitmap(_bitmapName, 0.0, 0.0);
+        }
+    }
+/*
+Many other variations of Window are possible. A TransientWindow may need to communicate with the window that created it during the dialog; hence it keeps a reference to that window. A PaletteWindow always floats above other windows. An IconDockWindow holds IconWindows and arranges them neatly.
+
+Window operations are defined in terms of the WindowImp interface. For example, DrawRect extracts four coordinates from its two Point parameters before calling the WindowImp operation that draws the rectangle in the window:
+*/
+     void Window::DrawRect (const Point&amp; p1, const Point&amp; p2) {
+        WindowImp* imp = GetWindowImp();
+        imp-&gt;DeviceRect(p1.X(), p1.Y(), p2.X(), p2.Y());
+    }
+
+//Concrete subclasses of WindowImp support different window systems. The XWindowImp subclass supports the X Window System:
+
+     class XWindowImp : public WindowImp {
+    public:
+        XWindowImp();
+    
+        virtual void DeviceRect(Coord, Coord, Coord, Coord);
+        // remainder of public interface...
+    private:
+        // lots of X window system-specific state, including:
+        Display* _dpy;
+        Drawable _winid;  // window id
+        GC _gc;           // window graphic context
+    };
+
+//For Presentation Manager (PM), we define a PMWindowImp class:
+
+     class PMWindowImp : public WindowImp {
+    public:
+        PMWindowImp();
+        virtual void DeviceRect(Coord, Coord, Coord, Coord);
+    
+        // remainder of public interface...
+    private:
+        // lots of PM window system-specific state, including:
+        HPS _hps;
+    };
+/*
+These subclasses implement WindowImp operations in terms of window system primitives. For example, DeviceRect is implemented for X as follows:
+*/
+     void XWindowImp::DeviceRect (
+        Coord x0, Coord y0, Coord x1, Coord y1
+    ) {
+        int x = round(min(x0, x1));
+        int y = round(min(y0, y1));
+        int w = round(abs(x0 - x1));
+        int h = round(abs(y0 - y1));
+        XDrawRectangle(_dpy, _winid, _gc, x, y, w, h);
+    }
+
+//The PM implementation might look like this:
+
+     void PMWindowImp::DeviceRect (
+        Coord x0, Coord y0, Coord x1, Coord y1
+    ) {
+        Coord left = min(x0, x1);
+        Coord right = max(x0, x1);
+        Coord bottom = min(y0, y1);
+        Coord top = max(y0, y1);
+    
+        PPOINTL point[4];
+    
+        point[0].x = left;    point[0].y = top;
+        point[1].x = right;   point[1].y = top;
+        point[2].x = right;   point[2].y = bottom;
+        point[3].x = left;    point[3].y = bottom;
+    
+        if (
+            (GpiBeginPath(_hps, 1L) == false) ||
+            (GpiSetCurrentPosition(_hps, &amp;point[3]) == false) ||
+            (GpiPolyLine(_hps, 4L, point) == GPI_ERROR)  ||
+            (GpiEndPath(_hps) == false)
+        ) {
+            // report error
+    
+        } else {
+            GpiStrokePath(_hps, 1L, 0L);
+        }
+    }
+/*
+How does a window obtain an instance of the right WindowImp subclass? Well assume Window has that responsibility in this example. Its GetWindowImp operation gets the right instance from an abstract factory (see Abstract Factory (87)) that effectively encapsulates all window system specifics.
+*/
+     WindowImp* Window::GetWindowImp () {
+        if (_imp == 0) {
+            _imp = WindowSystemFactory::Instance()-&gt;MakeWindowImp();
+        }
+        return _imp;
+    }
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

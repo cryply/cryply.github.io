@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Template Method · Boris Ivanov</title>
+<meta name="description" content="1. Usage Define the skeleton of an algorithm in base class &quot;Template Method&quot; Steps required concrete implementation define as placeholders in base class Derifed">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Template Method</h1>
+<p class="meta">Originally published 2016-08-27 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ol>
+<li>Define the skeleton of an algorithm in base class "Template Method"</li>
+<li>Steps required concrete implementation define as placeholders in base class</li>
+<li>Derifed classes fill-up placeholders with concrete implementations</li>
+</ol>
+<h3>2. UML class diagram</h3>
+<p><img src="http://cpp-reference.ru/images/patterns/uml-template-method-2.gif" /></p>
+<h3>3. Pros</h3>
+<ol>
+<li>shields the client from the details of the variant behaviour </li>
+<li>quality & productivity – only the variant behaviour needs to be implemented </li>
+</ol>
+<h3>4. Cons</h3>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+
+// From https://sourcemaking.com/design_patterns/template_method/cpp/1
+#include &lt;iostream&gt;
+using namespace std;
+
+class Base
+{
+    void a()
+    {
+        cout &lt;&lt; &quot;a  &quot;;
+    }
+    void c()
+    {
+        cout &lt;&lt; &quot;c  &quot;;
+    }
+    void e()
+    {
+        cout &lt;&lt; &quot;e  &quot;;
+    }
+    // 2. Steps requiring peculiar implementations are &quot;placeholders&quot; in base class
+    virtual void ph1() = 0;
+    virtual void ph2() = 0;
+  public:
+    // 1. Standardize the skeleton of an algorithm in a base class &quot;template method&quot;
+    void execute()
+    {
+        a();
+        ph1();
+        c();
+        ph2();
+        e();
+    }
+};
+
+class One: public Base
+{
+    // 3. Derived classes implement placeholder methods
+     /*virtual*/void ph1()
+    {
+        cout &lt;&lt; &quot;b  &quot;;
+    }
+     /*virtual*/void ph2()
+    {
+        cout &lt;&lt; &quot;d  &quot;;
+    }
+};
+
+class Two: public Base
+{
+     /*virtual*/void ph1()
+    {
+        cout &lt;&lt; &quot;2  &quot;;
+    }
+     /*virtual*/void ph2()
+    {
+        cout &lt;&lt; &quot;4  &quot;;
+    }
+};
+
+int main()
+{
+  Base *array[] = 
+  {
+     &amp;One(), &amp;Two()
+  };
+  for (int i = 0; i &lt; 2; i++)
+  {
+    array[i]-&gt;execute();
+    cout &lt;&lt; \n;
+  }
+}</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

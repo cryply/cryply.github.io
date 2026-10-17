@@ -1,0 +1,46 @@
+:root { --fg:#1b1b1b; --muted:#666; --bg:#fdfdfc; --accent:#8a3324; --line:#e3e0da;
+        --code-bg:#f5f3ef; }
+@media (prefers-color-scheme: dark) { :root {
+  --fg:#e6e4e0; --muted:#9a968e; --bg:#16161a; --accent:#d98b6a; --line:#2e2e34;
+  --code-bg:#1e1e24; } }
+* { box-sizing:border-box; }
+body { margin:0 auto; padding:2.5rem 1rem 5rem; max-width:46rem; background:var(--bg);
+  color:var(--fg); font:16px/1.65 Georgia,"Iowan Old Style",serif;
+  -webkit-text-size-adjust:100%; }
+a { color:var(--accent); }
+header.site h1 { margin:0 0 .2rem; font-size:1.6rem; letter-spacing:-.01em; }
+header.site { margin-bottom:2.5rem; }
+header.site p { margin:0; color:var(--muted); font-size:.95rem; }
+header.site p.elsewhere { margin-top:.6rem; font-size:.9rem; }
+nav.back { margin-bottom:1.5rem; font-size:.9rem; }
+section.group { margin:0 0 2.5rem; }
+section.group h2 { font-size:1.1rem; margin:0 0 .3rem; }
+section.group > p { margin:0 0 1rem; color:var(--muted); font-size:.92rem; }
+ul.posts { list-style:none; margin:0; padding:0; }
+ul.posts li { display:flex; gap:1rem; padding:.35rem 0; border-bottom:1px solid var(--line); }
+ul.posts time { flex:0 0 6.2rem; color:var(--muted); font-size:.85rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding-top:.15rem; }
+article h1 { font-size:1.5rem; line-height:1.25; margin:0 0 .3rem; }
+article h3 { font-size:1.05rem; margin:2rem 0 .5rem; }
+.meta { color:var(--muted); font-size:.85rem; margin:0 0 2rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+article img { max-width:100%; height:auto; display:block; margin:1.2rem 0;
+  border:1px solid var(--line); border-radius:3px; }
+pre { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:.9rem 1rem; overflow-x:auto; font-size:.84rem; line-height:1.5; }
+pre code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+:not(pre) > code { background:var(--code-bg); padding:.1em .35em; border-radius:3px;
+  font-size:.88em; }
+blockquote { margin:1.2rem 0; padding-left:1rem; border-left:3px solid var(--line);
+  color:var(--muted); }
+footer.site { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line);
+  color:var(--muted); font-size:.85rem; }
+.note { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:.8rem 1rem; font-size:.9rem; color:var(--muted); margin:0 0 2rem; }
+.comments { margin-top:3.5rem; border-top:1px solid var(--line); padding-top:1.5rem; }
+.comments h2 { font-size:1.05rem; margin:0 0 1rem; }
+.comment { margin:0 0 1.2rem; font-size:.95rem; }
+.comment.reply { margin-left:1.5rem; padding-left:1rem; border-left:2px solid var(--line); }
+.comment .who { font-size:.82rem; color:var(--muted);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.comment p { margin:.3rem 0 0; }

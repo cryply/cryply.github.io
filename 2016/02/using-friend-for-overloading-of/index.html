@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Using &quot;friend&quot; for overloading of &lt;&lt; operator. · Boris Ivanov</title>
+<meta name="description" content="1. Overloading with free function. Function not part of Class. Basic class accessed by Reference not to make Copy and as Const as we not gonna change it. Only p">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Using &quot;friend&quot; for overloading of &lt;&lt; operator.</h1>
+<p class="meta">Originally published 2016-02-23 · Boris Ivanov</p>
+<h3>1. Overloading with free function.</h3>
+<ul>
+<li>Function not part of Class.</li>
+<li>Basic class accessed by Reference not to make Copy and as Const as we not gonna change it.</li>
+<li>Only public members of class accessable</li>
+</ul>
+<pre><code class="language-cpp">
+#include &lt;iostream&gt;
+using namespace std;
+class Basic{
+public:
+
+    Basic(int x, int y): _x(x), _y(y){}
+    int _x;
+    int _y;
+
+};
+
+ostream&amp; operator&lt;&lt;(ostream&amp; os, const Basic&amp; obj) {
+    os &lt;&lt; obj._x &lt;&lt; &quot;,&quot; &lt;&lt; obj._y;
+    return os;
+}
+
+
+int main(int argc, char *argv[])
+{
+    Basic a = Basic(10,20);
+    cout &lt;&lt; a &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+<h3>2. Overloading with member function.</h3>
+<ul>
+<li>Function is part of Class.</li>
+<li>Basic class accessed by Reference not to make Copy and as Const as we not gonna change it.</li>
+<li>Even private members of class accessable</li>
+</ul>
+<pre><code class="language-cpp">
+#include &lt;iostream&gt;
+
+using namespace std;
+
+class Basic{
+
+public:
+
+    Basic(int x, int y): _x(x), _y(y){}
+    void private_stream(ostream&amp; os) const
+    { os &lt;&lt; _x &lt;&lt; &quot;:&quot; &lt;&lt; _y; }
+
+private:
+    int _x;
+    int _y;
+
+};
+
+inline ostream&amp; operator&lt;&lt;(ostream&amp; os, const  Basic&amp; obj) {
+    obj.private_stream(os);
+    return os;
+}
+
+
+int main(int argc, char *argv[])
+{
+    Basic a = Basic(10,20);
+    cout &lt;&lt; a &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+<h3>3. overloading with "friend" function.</h3>
+<ul>
+<li>Friend Function declared in Class but defined outside.</li>
+<li>Basic class accessed by Reference not to make Copy and as Const as we not gonna change it.</li>
+<li>Even private members of class accessable</li>
+</ul>
+<pre><code class="language-cpp">
+#include &lt;iostream&gt;
+using namespace std;
+class Basic{
+
+public:
+
+    Basic(int x, int y): _x(x), _y(y){}
+    friend ostream&amp; operator&lt;&lt; (ostream&amp; , const Basic&amp; );
+
+private:
+    int _x;
+    int _y;
+
+};
+
+inline ostream&amp; operator&lt;&lt;(ostream&amp; os, const  Basic&amp; obj) {
+    os &lt;&lt; obj._x &lt;&lt; &quot;:&quot; &lt;&lt; obj._y;
+    return os;
+}
+
+
+int main(int argc, char *argv[])
+{
+    Basic a = Basic(10,20);
+    cout &lt;&lt; a &lt;&lt; endl;
+    return 0;
+}
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

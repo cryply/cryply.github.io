@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Observer pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Pattern Observer - define relationship &quot;one to many&quot; such way that when state of object change all dependent objects notified/updated automatically. Pa">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Observer pattern</h1>
+<p class="meta">Originally published 2016-07-03 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ol>
+<li>Pattern Observer - define relationship "one to many" such way that when state of object change all dependent objects notified/updated automatically.</li>
+<li>Pattern Observer encapsulate main component in Subject abstraction and dependent objects in Observer hierarchy.</li>
+<li>Observer used IN MVC as View part</li>
+</ol>
+<p>This pattern used widely in User interfaces.</p>
+<h3>2. UML class diagram</h3>
+<p><img src="http://cpp-reference.ru/images/patterns/uml-observer.gif" alt="UML-диаграмма классов паттерна Observer" /></p>
+<h3>3. Pros</h3>
+<ol>
+<li>The Observer Pattern avoids direct object interactions and can be used when one or more objects are interested in the state changes of a given object.</li>
+<li>It can be used to develop loosely coupled applications maintaining object state dependencies.</li>
+<li>It can be used when the number of state dependent objects is not known in advance or even when the number may even change over time.</li>
+<li>Subject and the Observer objects can be reused separately and they can vary independently.</li>
+<li>The Observer Pattern can be used to develop application in layers. For example, a user interface application can contain spreadsheet, graph, and chart objects (Observers, at a higher level) that are dependent on the data from a database object (Subject, at a lower level). When the data in the database object changes all the Observers are automatically notified through the abstract operation defined in the Observer base class. Since the abstract operation is defined in the base class, the Subject need not know the concrete Observer classes and hence they are loosely coupled.</li>
+<li>Since all the Observers are notified through the same abstract operation, it is easy to add or remove Observers on demand.</li>
+</ol>
+<h3>4. Cons</h3>
+<ol>
+<li>In most situations, Observers will simply be only notified about a state change. It is up to the Observer to find out what exactly has changed. However, this can be avoided by including additional information (or the Aspect of change) along with the notification. This will give some clue about the change to the Observer.</li>
+<li>Observer objects are totally independent and they have no knowledge on the existence of the fellow Observers. Therefore, an Observer object can change the state of the Subject (in the Update method) before even all the Observers are notified. This may result in state inconsistencies and the state change notifications will be lost.</li>
+<li>Whenever an Observer changes the Subjects state, all the dependent Observers are notified. If the dependency criteria is not well defined, recursive updates can easily happen. Usually, in Stair-Masters the workout program and the heart rate are mutually dependent. That is, when the program changes (say from Fat Burn to Cardio) the heart rate changes and when the heart rate range falls below or goes above a threshold limit the program automatically changes. For the sake of simplicity, this dependency criterion is not enforced in the example. Assuming that the dependency criterion is not well defined in the example, Program controller will update the Cardio Subject when the program changes and Heart rate monitor will recompute the heart rate. If the heart rate falls below or goes above the threshold level, the heart rate monitor will update the Cardio Subject to change the program, which in turn will update the Program controller and this cycle repeats. Therefore, Heart rate monitor and Program controller blindly updates the Cardio Subject, which notifies both these monitors to update themselves resulting in recursive update calls.</li>
+<li>Observer Pattern introduces an additional level of indirection to maintain state consistency. This increases the flexibility in the application design, but has a sure performance impact. Also, too many indirections decrease the understandability of the code.</li>
+<li>When the Subject is deleted, the Observers dont have a direct way to know about the deletion. Therefore, the Observers will have dangling reference to the deleted Subjects.</li>
+</ol>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+using namespace std;
+
+class Subject {
+    // 1. &quot;independent&quot; functionality
+    vector &lt; class Observer * &gt; views; // 3. Coupled only to &quot;interface&quot;
+    int value;
+  public:
+    void attach(Observer *obs) {
+        views.push_back(obs);
+    }
+    void setVal(int val) {
+        value = val;
+        notify();
+    }
+    int getVal() {
+        return value;
+    }
+    void notify();
+};
+
+class Observer {
+    // 2. &quot;dependent&quot; functionality
+    Subject *model;
+    int denom;
+  public:
+    Observer(Subject *mod, int div) {
+        model = mod;
+        denom = div;
+        // 4. Observers register themselves with the Subject
+        model-&gt;attach(this);
+    }
+    virtual void update() = 0;
+  protected:
+    Subject *getSubject() {
+        return model;
+    }
+    int getDivisor() {
+        return denom;
+    }
+};
+
+void Subject::notify() {
+  // 5. Publisher broadcasts
+  for (int i = 0; i &lt; views.size(); i++)
+    views[i]-&gt;update();
+}
+
+class DivObserver: public Observer {
+  public:
+    DivObserver(Subject *mod, int div): Observer(mod, div){}
+    void update() {
+        // 6. &quot;Pull&quot; information of interest
+        int v = getSubject()-&gt;getVal(), d = getDivisor();
+        cout &lt;&lt; v &lt;&lt; &quot; div &quot; &lt;&lt; d &lt;&lt; &quot; is &quot; &lt;&lt; v / d &lt;&lt; \n;
+    }
+};
+
+class ModObserver: public Observer {
+  public:
+    ModObserver(Subject *mod, int div): Observer(mod, div){}
+    void update() {
+        int v = getSubject()-&gt;getVal(), d = getDivisor();
+        cout &lt;&lt; v &lt;&lt; &quot; mod &quot; &lt;&lt; d &lt;&lt; &quot; is &quot; &lt;&lt; v % d &lt;&lt; \n;
+    }
+};
+
+int main() {
+  Subject subj;
+  DivObserver divObs1(&amp;subj, 4); // 7. Client configures the number and
+  DivObserver divObs2(&amp;subj, 3); //    type of Observers
+  ModObserver modObs3(&amp;subj, 3);
+  subj.setVal(14);
+}
+
+/*
+Output
+14 div 4 is 3
+14 div 3 is 4
+14 mod 3 is 2
+*/
+</code></pre>
+<h3>Reference</h3>
+<ul>
+<li>https://sourcemaking.com/design_patterns/observer/cpp/3</li>
+<li>http://www.codeguru.com/cpp/cpp/cpp_mfc/patterns/article.php/c837/Applying-Observer-Pattern-in-C-Applications.htm</li>
+<ul>
+</pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>

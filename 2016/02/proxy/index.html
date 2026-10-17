@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proxy · Boris Ivanov</title>
+<meta name="description" content="1. Usage Proxy pattern in general is Wrapper. Sometimes its hard/impossible to modify real object. For client using Proxy object should be same like using real ">
+<link rel="stylesheet" href="../../../style.css">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Proxy</h1>
+<p class="meta">Originally published 2016-02-28 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>Proxy pattern in general is Wrapper. Sometimes its hard/impossible to modify real object. For client using Proxy object should be same like using real object as they share same interface.
+<p>Consider following usage scenarios:</p>
+<ul>
+<li>Remote Proxy - in distributed communication we create local proxy object which hide all communication with remote object</li>
+<li>Virtual Proxy - handles situations when object is expensive to create.(lazy initialization)</li>
+<li>Protection Proxy - Wrapper of extra protection measures around real object</li>
+<li>Smart proxy - adds extra operations when object is accessed.</li>
+</ul>
+<p>While adapter bridges the gap between two classes - proxy provides a surrogate to control the access to the real object</p>
+</p>
+<h3>2. UML class diagram</h3>
+<p><a href="../../../wp-content/uploads/2016/02/proxy.png" rel="attachment wp-att-383"><img src="../../../wp-content/uploads/2016/02/proxy.png" alt="proxy" class="alignnone size-full wp-image-383" /></a></p>
+<h3>3. Pros</h3>
+<ul>
+<li>More maintainable if number of usage of object more then 4-5</li>
+<li>More control over method calls.</li>
+<li>More robust as only constructed object will be available to client</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>Code duplication needs to copy all fields from original object.</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+#include &lt;iostream&gt;
+
+using namespace std;
+
+class ICar {
+public:
+  virtual void DriveCar() = 0;
+};
+
+class Car : public ICar {
+public:
+
+    void DriveCar() {
+        cout &lt;&lt; &quot;Driving Car!&quot; &lt;&lt; endl;
+    }
+private:
+  ICar* _pImpl;
+};
+
+class ProxyCar : public ICar {
+public:
+  ProxyCar(int driver_age) :  _driver_age(driver_age) {
+      _pImpl = new Car();
+  }
+
+  void DriveCar() {
+    if (_driver_age &gt;= 16){
+      _pImpl-&gt;DriveCar();
+    }else{
+        cout &lt;&lt; &quot;Driving car for under age not allowed.&quot; &lt;&lt; endl;
+    }
+  }
+
+private:
+  ICar* _pImpl;
+  int _driver_age;
+};
+
+int main()
+{
+    ICar * car = new ProxyCar(14);
+    car-&gt;DriveCar();
+    car = new ProxyCar(21);
+    car-&gt;DriveCar();
+    return 0;
+}
+
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.</footer>
+</body>
+</html>
