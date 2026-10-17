@@ -4,13 +4,16 @@
   --fg:#e6e4e0; --muted:#9a968e; --bg:#16161a; --accent:#d98b6a; --line:#2e2e34;
   --code-bg:#1e1e24; } }
 * { box-sizing:border-box; }
-/* Базовый кегль плавающий: на телефоне 17px, на широком экране до 20px.
-   Georgia мелкая в своём кегле, 16px на большом мониторе читается тяжело.
-   max-width в rem, поэтому колонка растёт вместе со шрифтом и длина
-   строки остаётся около 70 знаков. */
-body { margin:0 auto; padding:3rem 1.1rem 6rem; max-width:40rem; background:var(--bg);
+/* Кегль и ширина подобраны под широкий монитор: Georgia мелкая в своём
+   кегле, и 16px в колонке на 46rem читались тяжело. Теперь базовый
+   размер плавает от 17px на телефоне до 22px на большом экране, а
+   колонка — 52rem, то есть растёт вместе со шрифтом.
+   КРУТИТЬ ЗДЕСЬ, если захочется иначе: верхняя граница в clamp() —
+   размер текста, max-width — ширина колонки. Больше 56rem при таком
+   кегле строка становится длинной и глаз начинает терять начало. */
+body { margin:0 auto; padding:3rem 1.2rem 6rem; max-width:52rem; background:var(--bg);
   color:var(--fg);
-  font:clamp(17px, 0.9rem + 0.35vw, 20px)/1.7 Georgia,"Iowan Old Style",serif;
+  font:clamp(17px, 0.95rem + 0.45vw, 22px)/1.7 Georgia,"Iowan Old Style",serif;
   -webkit-text-size-adjust:100%; }
 a { color:var(--accent); }
 header.site h1 { margin:0 0 .25rem; font-size:1.8rem; letter-spacing:-.01em; }
