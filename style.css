@@ -4,43 +4,48 @@
   --fg:#e6e4e0; --muted:#9a968e; --bg:#16161a; --accent:#d98b6a; --line:#2e2e34;
   --code-bg:#1e1e24; } }
 * { box-sizing:border-box; }
-body { margin:0 auto; padding:2.5rem 1rem 5rem; max-width:46rem; background:var(--bg);
-  color:var(--fg); font:16px/1.65 Georgia,"Iowan Old Style",serif;
+/* Базовый кегль плавающий: на телефоне 17px, на широком экране до 20px.
+   Georgia мелкая в своём кегле, 16px на большом мониторе читается тяжело.
+   max-width в rem, поэтому колонка растёт вместе со шрифтом и длина
+   строки остаётся около 70 знаков. */
+body { margin:0 auto; padding:3rem 1.1rem 6rem; max-width:40rem; background:var(--bg);
+  color:var(--fg);
+  font:clamp(17px, 0.9rem + 0.35vw, 20px)/1.7 Georgia,"Iowan Old Style",serif;
   -webkit-text-size-adjust:100%; }
 a { color:var(--accent); }
-header.site h1 { margin:0 0 .2rem; font-size:1.6rem; letter-spacing:-.01em; }
+header.site h1 { margin:0 0 .25rem; font-size:1.8rem; letter-spacing:-.01em; }
 header.site { margin-bottom:2.5rem; }
-header.site p { margin:0; color:var(--muted); font-size:.95rem; }
-header.site p.elsewhere { margin-top:.6rem; font-size:.9rem; }
-nav.back { margin-bottom:1.5rem; font-size:.9rem; }
+header.site p { margin:0; color:var(--muted); font-size:1rem; }
+header.site p.elsewhere { margin-top:.7rem; font-size:.95rem; }
+nav.back { margin-bottom:1.5rem; font-size:.95rem; }
 section.group { margin:0 0 2.5rem; }
-section.group h2 { font-size:1.1rem; margin:0 0 .3rem; }
-section.group > p { margin:0 0 1rem; color:var(--muted); font-size:.92rem; }
+section.group h2 { font-size:1.25rem; margin:0 0 .35rem; }
+section.group > p { margin:0 0 1.1rem; color:var(--muted); font-size:.97rem; }
 ul.posts { list-style:none; margin:0; padding:0; }
-ul.posts li { display:flex; gap:1rem; padding:.35rem 0; border-bottom:1px solid var(--line); }
-ul.posts time { flex:0 0 6.2rem; color:var(--muted); font-size:.85rem;
-  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding-top:.15rem; }
-article h1 { font-size:1.5rem; line-height:1.25; margin:0 0 .3rem; }
-article h3 { font-size:1.05rem; margin:2rem 0 .5rem; }
-.meta { color:var(--muted); font-size:.85rem; margin:0 0 2rem;
+ul.posts li { display:flex; gap:1rem; padding:.5rem 0; border-bottom:1px solid var(--line); }
+ul.posts time { flex:0 0 6.4rem; color:var(--muted); font-size:.88rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding-top:.2rem; }
+article h1 { font-size:1.75rem; line-height:1.25; margin:0 0 .35rem; }
+article h3 { font-size:1.2rem; margin:2.2rem 0 .6rem; }
+.meta { color:var(--muted); font-size:.88rem; margin:0 0 2.2rem;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 article img { max-width:100%; height:auto; display:block; margin:1.2rem 0;
   border:1px solid var(--line); border-radius:3px; }
 pre { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
-  padding:.9rem 1rem; overflow-x:auto; font-size:.84rem; line-height:1.5; }
+  padding:1rem 1.1rem; overflow-x:auto; font-size:.86rem; line-height:1.55; }
 pre code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
 :not(pre) > code { background:var(--code-bg); padding:.1em .35em; border-radius:3px;
   font-size:.88em; }
 blockquote { margin:1.2rem 0; padding-left:1rem; border-left:3px solid var(--line);
   color:var(--muted); }
 footer.site { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line);
-  color:var(--muted); font-size:.85rem; }
+  color:var(--muted); font-size:.9rem; }
 .note { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
-  padding:.8rem 1rem; font-size:.9rem; color:var(--muted); margin:0 0 2rem; }
+  padding:.9rem 1.1rem; font-size:.95rem; color:var(--muted); margin:0 0 2.2rem; }
 .comments { margin-top:3.5rem; border-top:1px solid var(--line); padding-top:1.5rem; }
-.comments h2 { font-size:1.05rem; margin:0 0 1rem; }
-.comment { margin:0 0 1.2rem; font-size:.95rem; }
+.comments h2 { font-size:1.2rem; margin:0 0 1rem; }
+.comment { margin:0 0 1.3rem; font-size:1rem; }
 .comment.reply { margin-left:1.5rem; padding-left:1rem; border-left:2px solid var(--line); }
-.comment .who { font-size:.82rem; color:var(--muted);
+.comment .who { font-size:.85rem; color:var(--muted);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 .comment p { margin:.3rem 0 0; }
