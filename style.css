@@ -42,7 +42,7 @@ pre code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
 blockquote { margin:1.2rem 0; padding-left:1rem; border-left:3px solid var(--line);
   color:var(--muted); }
 footer.site { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line);
-  color:var(--muted); font-size:.9rem; }
+  color:var(--muted); font-size:.9rem; line-height:1.55; }
 .note { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
   padding:.9rem 1.1rem; font-size:.95rem; color:var(--muted); margin:0 0 2.2rem; }
 .comments { margin-top:3.5rem; border-top:1px solid var(--line); padding-top:1.5rem; }
