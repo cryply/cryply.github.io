@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Strategy Pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from the clients tha">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Strategy Pattern</h1>
+<p class="meta">Originally published 2016-05-16 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ul>
+<li>Define a family of algorithms, encapsulate each one, and make them interchangeable. Strategy lets the algorithm vary independently from the clients that use it.</li>
+<li>Capture the abstraction in an interface, bury implementation details in derived classes.</li>
+</ul>
+<h3>2. UML class diagram</h3>
+<p><img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Strategy_Pattern_in_UML.png" alt="https://upload.wikimedia.org/wikipedia/commons/3/39/Strategy_Pattern_in_UML.png" /></p>
+<h3>3. Pros</h3>
+<ul>
+<li>greater flexibility, reuse</li>
+<li>can change algorithms dynamically</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>strategy creation & communication overhead</li>
+<li>inflexible Strategy interface</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+/*
+From : http://r3dux.org/2011/07/an-example-implementation-of-the-strategy-design-pattern-in-c/
+Pattern: Strategy
+Definition: The strategy pattern defines a family of algorithms (i.e. functions), encapsulates each one, and
+makes them interchangable. The Strategy pattern lets the algorithm vary independently from clients that use it.
+Example source: Head-First Design Patterns, pages 13-24 [ Converted from Java to C++ | 10/07/2011 | r3dux ]
+*/
+
+#include &lt;iostream&gt;
+
+using namespace std;
+
+// ----------------------- Quack interface -------------------------
+class QuackBehaviour
+{
+	public:
+		virtual void quack() = 0; // Abstract class because of this pure virtual function
+};
+
+class Quack : public QuackBehaviour
+{
+	public:
+		void quack()
+		{
+			cout &lt;&lt; &quot;The duck says: Quack!&quot; &lt;&lt; endl;
+		}
+};
+
+class MuteQuack : public QuackBehaviour
+{
+	public:
+		void quack()
+		{
+			cout &lt;&lt; &quot;The duck says: &lt;&lt;&lt; Silence &gt;&gt;&gt;&quot; &lt;&lt; endl;
+		}
+};
+// ----------------------- End of Quack interface -------------------------
+
+
+// ----------------------- Fly interface -------------------------
+class FlyBehaviour
+{
+	public:
+		virtual void fly() = 0; // Abstract class because of this pure virtual function
+};
+
+class FlyWithWings : public FlyBehaviour
+{
+	public:
+		void fly()
+		{
+			cout &lt;&lt; &quot;The duck flies into the friendly skies!&quot; &lt;&lt; endl;
+		}
+};
+
+class FlyNoWay : public FlyBehaviour
+{
+	public:
+		void fly()
+		{
+			cout &lt;&lt; &quot;I cant fly!&quot; &lt;&lt; endl;
+		}
+};
+
+class FlyWithRocket : public FlyBehaviour
+{
+	public:
+		void fly()
+		{
+			cout &lt;&lt; &quot;The duck flies through the air using a rocket!&quot; &lt;&lt; endl;
+		}
+};
+// ----------------------- End of Fly interface -------------------------
+
+// ----------------------- Duck class and subtypes -------------------------
+class Duck
+{
+	public:
+		QuackBehaviour *quackBehaviour;
+		FlyBehaviour   *flyBehaviour;
+
+		void performQuack()
+		{
+			quackBehaviour-&gt;quack();
+		}
+
+		void setQuackBehaviour(QuackBehaviour *qb)
+		{
+			cout &lt;&lt; &quot;Changing quack behaviour...&quot; &lt;&lt; endl;
+			quackBehaviour = qb;
+		}
+
+		void performFly()
+		{
+			flyBehaviour-&gt;fly();
+		}
+
+		void setFlyBehaviour(FlyBehaviour *fb)
+		{
+			cout &lt;&lt; &quot;Changing fly behaviour...&quot; &lt;&lt; endl;
+			flyBehaviour = fb;
+		}
+
+		void floatAround()
+		{
+			cout &lt;&lt; &quot;The duck bobs peacefully on the surface of the water.&quot; &lt;&lt; endl;
+		}
+
+		virtual void display() = 0; // Make this an abstract class by having a pure virtual function
+
+
+};
+
+class MallardDuck : public Duck
+{
+	public:
+		MallardDuck()
+		{
+			quackBehaviour = new Quack();
+			flyBehaviour   = new FlyWithWings();
+		}
+
+		void display()
+		{
+			cout &lt;&lt; &quot;Im a real mallard duck!&quot; &lt;&lt; endl;
+		}
+
+};
+
+class RubberDuck : public Duck
+{
+	public:
+		RubberDuck()
+		{
+			quackBehaviour = new MuteQuack();
+			flyBehaviour   = new FlyNoWay();
+		}
+
+		void display()
+		{
+			cout &lt;&lt; &quot;Im a rubber-ducky!&quot; &lt;&lt; endl;
+		}
+};
+
+class PaintedDuck : public Duck
+{
+	public:
+		PaintedDuck()
+		{
+			quackBehaviour = new MuteQuack();
+			flyBehaviour   = new FlyNoWay();
+		}
+
+		void display()
+		{
+			cout &lt;&lt; &quot;Im a painted wooden duck!&quot; &lt;&lt; endl;
+		}
+};
+// ----------------------- End of Duck class and subtypes -------------------------
+
+// ----------------------- The main event -------------------------
+int main()
+{
+	Duck *mallard = new MallardDuck();
+	mallard-&gt;display();
+	mallard-&gt;floatAround();
+	mallard-&gt;performFly();
+	mallard-&gt;performQuack();
+
+	cout &lt;&lt; endl &lt;&lt; endl;
+
+	Duck *rubber = new RubberDuck();
+	rubber-&gt;display();
+	rubber-&gt;floatAround();
+	rubber-&gt;performFly();
+	rubber-&gt;performQuack();
+
+	cout &lt;&lt; endl &lt;&lt; endl;
+
+	Duck *painted = new PaintedDuck();
+	painted-&gt;display();
+	painted-&gt;floatAround();
+	painted-&gt;performFly();
+	painted-&gt;setFlyBehaviour(new FlyWithRocket);
+	painted-&gt;performFly();
+	painted-&gt;performQuack();
+	painted-&gt;setQuackBehaviour(new Quack);
+	painted-&gt;performQuack();
+
+	return 0;
+}</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interpreter pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Specialized database query languages such as SQL,RegExp. Specialized computer languages which are often used to describe communication protocols. Most ">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Interpreter pattern</h1>
+<p class="meta">Originally published 2016-04-26 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ul>
+<li>Specialized database query languages such as SQL,RegExp.</li>
+<li>Specialized computer languages which are often used to describe communication protocols.</li>
+<li>Most general-purpose computer languages actually incorporate several specialized languages.(lua script inside game engine)</li>
+</ul>
+<h3>2. UML class diagram</h3>
+<p><img src="https://upload.wikimedia.org/wikipedia/en/0/03/Interpreter_UML_class_diagram.jpg" alt="UML diagram of interptreter design pattern" /></p>
+<p><strong>AbstractExpression</strong></p>
+<ul>
+<li>Declares an abstract Interpret operation that is common to all nodes in the abstract syntax tree.</li>
+</ul>
+<p><strong>TerminalExpression</strong></p>
+<ul>
+<li>Implements an Interpret operation associated with terminal symbols in the grammar.</li>
+<li>An instance is required for every terminal symbol in a sentence.</li>
+</ul>
+<p><strong>NonterminalExpression</strong></p>
+<ul>
+<li>One such class is required for every rule R ::= R1 R2 ... Rn in the grammar.</li>
+<li>Maintains instance variables of type AbstractExpression for each of the symbols R1 through Rn.</li>
+<li>Implements an Interpret operation for non terminal symbols in the grammar. Interpret typically calls itself recursively on the variables representing R1 through Rn.</li>
+</ul>
+<p><strong>Context</strong></p>
+<ul>
+<li>Contains information that’s global to the interpreter.</li>
+</ul>
+<p><strong>Client</strong></p>
+<ul>
+<li>Builds (or is given) an abstract syntax tree representing a particular sentence in the language that the grammar defines. The abstract syntax tree is assembled from instances of the NonterminalExpression and TerminalExpression classes.</li>
+<li>Invokes the Interpret operation.</li>
+</ul>
+<h3>3. Pros</h3>
+<p>let solve task at higher level of abstraction.</p>
+<h3>4. Cons</h3>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+// https://en.wikibooks.org/wiki/C%2B%2B_Programming/Code/Design_Patterns/Behavioral_Patterns#Interpreter
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;map&gt;
+#include &lt;list&gt;
+
+namespace wikibooks_design_patterns
+{
+
+//	based on the Java sample around here
+
+typedef std::string String;
+struct Expression;
+typedef std::map&lt;String,Expression*&gt; Map;
+typedef std::list&lt;Expression*&gt; Stack;
+
+struct Expression {
+    virtual int interpret(Map variables) = 0;
+	virtual ~Expression() {}
+};
+ 
+class Number : public Expression {
+private:
+	int number;
+public: 
+	Number(int number)       { this-&gt;number = number; }
+	int interpret(Map variables)  { return number; }
+};
+ 
+class Plus : public Expression {
+    Expression* leftOperand;
+    Expression* rightOperand;
+public: 
+
+    Plus(Expression* left, Expression* right) { 
+        leftOperand = left; 
+        rightOperand = right;
+    }
+    ~Plus(){ 
+	delete leftOperand;
+	delete rightOperand;
+    }
+ 
+    int interpret(Map variables)  { 
+        return leftOperand-&gt;interpret(variables) + rightOperand-&gt;interpret(variables);
+    }
+};
+ 
+class Minus : public Expression {
+    Expression* leftOperand;
+    Expression* rightOperand;
+public: 
+    Minus(Expression* left, Expression* right) { 
+        leftOperand = left; 
+        rightOperand = right;
+    }
+    ~Minus(){ 
+	delete leftOperand;
+	delete rightOperand;
+    }
+ 
+    int interpret(Map variables)  { 
+        return leftOperand-&gt;interpret(variables) - rightOperand-&gt;interpret(variables);
+    }
+};
+ 
+class Variable : public Expression {
+    String name;
+public: 
+	Variable(String name)       { this-&gt;name = name; }
+    int interpret(Map variables)  { 
+        if(variables.end() == variables.find(name)) return 0;
+        return variables[name]-&gt;interpret(variables); 
+    }
+};
+
+//	While the interpreter pattern does not address parsing, a parser is provided for completeness.
+ 
+class Evaluator : public Expression {
+    Expression* syntaxTree;
+ 
+public:
+	Evaluator(String expression){
+        Stack expressionStack;
+
+	size_t last = 0;
+	for (size_t next = 0; String::npos != last; last = (String::npos == next) ? next : (1+next)) {
+	    next = expression.find( , last);
+	    String token( expression.substr(last, (String::npos == next) ? (expression.length()-last) : (next-last)));
+
+            if  (token == &quot;+&quot;) {
+		Expression* right = expressionStack.back(); expressionStack.pop_back();
+                Expression* left = expressionStack.back(); expressionStack.pop_back();
+                Expression* subExpression = new Plus(right, left);
+                expressionStack.push_back( subExpression );
+            }
+            else if (token == &quot;-&quot;) {
+                // its necessary remove first the right operand from the stack
+                Expression* right = expressionStack.back(); expressionStack.pop_back();
+                // ..and after the left one
+                Expression* left = expressionStack.back(); expressionStack.pop_back();
+                Expression* subExpression = new Minus(left, right);
+                expressionStack.push_back( subExpression );
+            }
+            else                        
+                expressionStack.push_back( new Variable(token) );
+        }
+
+        syntaxTree = expressionStack.back(); expressionStack.pop_back();
+    }
+
+     ~Evaluator() {
+	delete syntaxTree;
+     }
+ 
+    int interpret(Map context) {
+        return syntaxTree-&gt;interpret(context);
+    }
+};
+
+}
+
+void main()
+{
+	using namespace wikibooks_design_patterns;
+
+	Evaluator sentence(&quot;w x z - +&quot;);
+
+	static
+	const int sequences[][3] = {
+		{5, 10, 42}, {1, 3, 2}, {7, 9, -5},
+	};
+	for (size_t i = 0; sizeof(sequences)/sizeof(sequences[0]) &gt; i; ++i) {
+		Map variables;
+		variables[&quot;w&quot;] = new Number(sequences[i][0]);
+		variables[&quot;x&quot;] = new Number(sequences[i][1]);
+		variables[&quot;z&quot;] = new Number(sequences[i][2]);
+		int result = sentence.interpret(variables);
+		for (Map::iterator it = variables.begin(); variables.end() != it; ++it) delete it-&gt;second;
+    
+		std::cout&lt;&lt;&quot;Interpreter result: &quot;&lt;&lt;result&lt;&lt;std::endl;
+	}
+}</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

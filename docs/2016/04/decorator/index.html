@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Decorator · Boris Ivanov</title>
+<meta name="description" content="1. Usage Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality. [GoF">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Decorator</h1>
+<p class="meta">Originally published 2016-04-05 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ul>
+<li>Attach additional responsibilities to an object dynamically. Decorators provide a flexible alternative to subclassing for extending functionality. [GoF, p175]</li>
+<li>Client-specified embellishment of a core object by recursively wrapping it.</li>
+<li>Wrapping a gift, putting it in a box, and wrapping the box.</li>
+</ul>
+<h3>2. UML class diagram</h3>
+<p><img src="http://www.cs.unc.edu/%7Estotts/GOF/hires/Pictures/decor066.gif" alt="" /></p>
+<p><img src="http://www.cs.unc.edu/%7Estotts/GOF/hires/Pictures/decor067.gif" alt="" /></p>
+<h3>3. Pros</h3>
+<ul>
+<li>Decorators provide a flexible alternative to subclassing for extending functionality</li>
+<li>Decorators allow behavior modification at runtime rather than going back into existing code and making changes</li>
+<li>Decorators are a nice solution to permutation issues because you can wrap a component with any number of decorators</li>
+<li>The decorator pattern supports the principle that classes should be open for extension but closed for modification</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>Decorators can result in many small objects in our design, and overuse can be complex</li>
+<li>Decorators can cause issues if the client relies heavily on the components concrete type</li>
+<li>Decorators can complicate the process of instantiating the component because you not only have to instantiate the component but wrap it in a number of decorators</li>
+<li>It can be complicated to have decorators keep track of other decorators because to look back into multiple layers of the decorator chain starts to push the decorator pattern beyond its true intent</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+// From https://sourcemaking.com/design_patterns/decorator/cpp/2
+#include &lt;iostream&gt;
+using namespace std;
+
+// 1. &quot;lowest common denom&quot;
+class Widget
+{
+  public:
+    virtual void draw() = 0;
+};
+
+class TextField: public Widget
+{
+    // 3. &quot;Core&quot; class &amp; &quot;is a&quot;
+    int width, height;
+  public:
+    TextField(int w, int h)
+    {
+        width = w;
+        height = h;
+    }
+ 
+    /*virtual*/
+    void draw()
+    {
+        cout &lt;&lt; &quot;TextField: &quot; &lt;&lt; width &lt;&lt; &quot;, &quot; &lt;&lt; height &lt;&lt; \n; } }; // 2. 2nd level base class class Decorator: public Widget // 4. &quot;is a&quot; relationship { Widget *wid; // 4. &quot;has a&quot; relationship public: Decorator(Widget *w) { wid = w; } /*virtual*/ void draw() { wid-&gt;draw(); // 5. Delegation
+    }
+};
+
+class BorderDecorator: public Decorator
+{
+  public:
+    // 6. Optional embellishment
+    BorderDecorator(Widget *w): Decorator(w){}
+ 
+    /*virtual*/
+    void draw()
+    {
+        // 7. Delegate to base class and add extra stuff
+        Decorator::draw();
+        cout &lt;&lt; &quot;   BorderDecorator&quot; &lt;&lt; \n;
+    }
+};
+
+class ScrollDecorator: public Decorator
+{
+  public:
+    // 6. Optional embellishment
+    ScrollDecorator(Widget *w): Decorator(w){}
+ 
+    /*virtual*/
+    void draw()
+    {
+        // 7. Delegate to base class and add extra stuff
+        Decorator::draw();
+        cout &lt;&lt; &quot;   ScrollDecorator&quot; &lt;&lt; \n; 
+    } 
+}; 
+
+int main() { 
+// 8. Client has the responsibility to compose desired configurations 
+ Widget *aWidget = new BorderDecorator(
+   new BorderDecorator(
+      new ScrollDecorator (
+          new TextField(80, 24)))); 
+ aWidget-&gt;draw();
+}
+</code></pre>
+<p>Decorator can be used with Streams to enhance basic stream with additional features:</p>
+<pre><code class="language-cpp">
+    Stream* aStream = new CompressingStream(
+        new ASCII7Stream(
+             new FileStream(&quot;aFileName&quot;)
+        )
+    );
+    aStream-&gt;PutInt(12);
+    aStream-&gt;PutString(&quot;aString&quot;);</code></pre>
+<h3> 6. Rules of thumb</h3>
+<ul>
+<li>Adapter provides a different interface to its subject. Proxy provides the same interface. Decorator provides an enhanced interface. [GoF, p216]</li>
+<li>Adapter changes an objects interface, Decorator enhances an objects responsibilities. Decorator is thus more transparent to the client. As a consequence, Decorator supports recursive composition, which isnt possible with pure Adapters. [GoF, p149]</li>
+<li>Composite and Decorator have similar structure diagrams, reflecting the fact that both rely on recursive composition to organize an open-ended number of objects. [GoF, p219]</li>
+<li>A Decorator can be viewed as a degenerate Composite with only one component. However, a Decorator adds additional responsibilities - it isnt intended for object aggregation. [GoF, p184]</li>
+<li>Decorator is designed to let you add responsibilities to objects without subclassing. Composites focus is not on embellishment but on representation. These intents are distinct but complementary. Consequently, Composite and Decorator are often used in concert. [GoF, p220]</li>
+<li>Composite could use Chain of Responsibility to let components access global properties through their parent. It could also use Decorator to override these properties on parts of the composition. [GoF, p349]</li>
+<li>Decorator and Proxy have different purposes but similar structures. Both describe how to provide a level of indirection to another object, and the implementations keep a reference to the object to which they forward requests. [GoF, p220]</li>
+<li>Decorator lets you change the skin of an object. Strategy lets you change the guts. [GoF, p184]</li>
+</ul>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

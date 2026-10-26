@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Memento pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Saves inner state of object in order to restore it in future. Usually implemented in Undo/Redo of Editors sometimes with Command Pattern. Memento in C+">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Memento pattern</h1>
+<p class="meta">Originally published 2016-04-16 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>Saves inner state of object in order to restore it in future. Usually implemented in Undo/Redo of Editors sometimes with Command Pattern. Memento in C++ implemented as Friend of Originator. Originator hide details of Memento providing narrow interface for controls.</p>
+<h3>2. UML class diagram</h3>
+<p>Originator (managed a contained Memento obj), Memento(snapshot of originator state, preserves incapsulation)<br />
+<img src="http://patterns.pl/png/mementoclass.png" alt="Memento" /><br />
+<img src="http://patterns.pl/png/mementoseq.png" alt="Memento UML sequence diagram" /></p>
+<h3>3. Pros</h3>
+<ul>
+<li>preserves encapsulation</li>
+<li>state can be stored and reloaded later on</li>
+</ul>
+<h3>4. Cons</h3>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+// From http://forum.codecall.net/topic/71737-c-proper-memento-implementation/
+/*
+* Memento, for now, saves the state only for var1 for Originator class.
+* You can add more states depending Orginator needs.
+*/
+class Memento {
+private:
+int mVar1;
+
+private:
+/*
+* We are making all the ways of creating a Memento private
+* so that no one can create/modify state of a memento other than the Originator.
+*/
+Memento(){}
+Memento(const Memento&amp; source){ mVar1 = source.mVar1;}
+Memento &amp;operator=(const Memento &amp;source){mVar1 = source.mVar1; return *this;}
+
+void setVar1(int var) {mVar1 = var;}
+int getVar1() const {return mVar1;}
+
+/*
+* Memento is declaring Originator as his friend so that Originator can
+* create Memento or access its members.
+*/
+friend class Orginator;
+};
+
+
+class Orginator {
+private:
+int mVar1;
+int mVar2;
+
+public:
+void setVar1(int var) {mVar1 = var;}
+int getVar1() const {return mVar1;}
+
+void setVar2(int var) {mVar2 = var;}
+int getVar2() const {return mVar2;}
+
+Memento* saveState()
+{
+Memento* memento = new Memento;
+memento-&gt;setVar1(getVar1());
+return memento;
+}
+
+void restoreState(Memento* memento)
+{
+setVar1(memento-&gt;getVar1());
+}
+};
+
+void mementoExample()
+{
+Orginator* originator = new Orginator;
+originator-&gt;setVar1(10);
+originator-&gt;setVar1(11);
+
+// create Memento
+Memento* memento = originator-&gt;saveState();
+
+// originator state
+originator-&gt;setVar1(12);
+
+// restore orignator state
+originator-&gt;restoreState(memento);
+}</code></pre>
+<h3>6. Reference</h3>
+<p><a href="http://sweberu.cluster014.ovh.net/SCEA/Synthesis/designPatterns.pdf" target="_blank">http://sweberu.cluster014.ovh.net/SCEA/Synthesis/designPatterns.pdf</a></p>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

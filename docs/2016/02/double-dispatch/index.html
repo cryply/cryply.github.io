@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Double Dispatch · Boris Ivanov</title>
+<meta name="description" content="Recently I was visiting one company and got C++ interview question: What is double dispatch. I studied C++ quite long time ago and that question confused me. Si">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Double Dispatch</h1>
+<p class="meta">Originally published 2016-02-07 · Boris Ivanov</p>
+<p>
+<div>Recently I was visiting one company and got C++ interview question: What is double dispatch. I studied C++ quite long time ago and that question confused me.</div>
+<div>Single Dispatch is calling virtual method based on V-Table (run-time) but double dispatch?</div>
+<div></div>
+<div>After interview I always review subjects which made me hard time. Thats only reason for going to interview - refresh memory of forgotten things and learn something new.
+</div>
+</p>
+<h3>Single Dispatch</h3>
+<p>
+Single dispatch is calling of virtual method - its basics of polymorphism in C++.
+</p>
+<pre><code class="language-cpp">
+// By Boris Ivanov (C) 2016.
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+using namespace std;
+
+class A{
+public:
+    virtual void work() = 0;
+};
+
+class A1: public A{
+    virtual void work (){
+        cout &lt;&lt; &quot;A1 do work&quot; &lt;&lt; &quot;\n&quot;; 
+    } 
+}; 
+
+int main( ) { 
+    A* a = new A1(); 
+    a-&gt;work(); 
+}
+</code></pre>
+<div></div>
+<div>Result :</div>
+<blockquote>
+<div>A1 do work</div>
+</blockquote>
+<div></div>
+<p><br></p>
+<h3>Double dispatch</h3>
+<p>
+<div>Double dispatch is the ability of selecting dynamically a method not only according to the run-time type of the receiver (single dispatch), but also to the run-time type of the argument.</div>
+<p><br></p>
+<div>This mechanism demonstrate power of dynamic binding in object-oriented languages, so enhancing re-usability and separation of responsibilities. However, many mainstream languages, such as C++. C# and Java, do not provide it, resorting to only single dispatch. Lets see how to implement it.</div>
+<p><br></p>
+<div> Imagine we have 2 types of objects and want to simulate their interaction. Assume we have <strong>Sphere</strong> like objects and <strong>Surface</strong>s. Make the pure Abstract. Derive from them <strong>Ball</strong>, <strong>Baloon</strong>, <strong>Table</strong> and <strong>Window</strong>.</div>
+<p><br></p>
+<div>Task is to implement their interaction through up-casted pointers;</div>
+<p>
+<pre><code class="language-cpp">
+// By Boris Ivanov (C) 2016.
+class Surface;
+class Table;
+class Window;
+
+class Ball;
+class Baloon;
+
+
+class Sphere{
+public:
+    virtual void hit (Surface&amp; a) = 0;
+    virtual void RealTimeHit (Table&amp; a) = 0;
+    virtual void RealTimeHit (Window&amp; a) = 0;
+};
+
+class Surface {
+public:
+    virtual void hit (Sphere&amp; b) = 0;
+    virtual void RealTimeHit (Ball&amp; b) = 0;
+    virtual void RealTimeHit (Baloon&amp; b) = 0;
+
+};
+
+class Ball : public Sphere
+{
+     void hit (Surface&amp; s)
+    {
+        s.RealTimeHit(*this);
+    }
+
+     void RealTimeHit (Table&amp; a){
+        cout &lt;&lt; &quot;Ball hit Table and bounced&quot; &lt;&lt; &quot;\n&quot;;
+    }
+
+     void RealTimeHit (Window&amp; a){
+        cout &lt;&lt; &quot;Ball hit Window and broken it!&quot; &lt;&lt; &quot;\n&quot;;
+    }
+};
+
+class Baloon : public Sphere
+{
+     void hit (Surface&amp; s)
+    {
+        s.RealTimeHit(*this);
+    }
+
+     void RealTimeHit (Table&amp; a){
+        cout &lt;&lt; &quot;Baloon hit Table and bounced&quot; &lt;&lt; &quot;\n&quot;;
+    }
+
+     void RealTimeHit (Window&amp; a){
+        cout &lt;&lt; &quot;Baloon hit Window and bounced it!&quot; &lt;&lt; &quot;\n&quot;;
+    }
+};
+
+class Table : public Surface
+{
+     void hit (Sphere&amp; s)
+    {
+        s.RealTimeHit(*this);
+    }
+
+     void RealTimeHit (Ball&amp; a){
+        cout &lt;&lt; &quot;Table hit by Ball but survived&quot; &lt;&lt; &quot;\n&quot;;
+    }
+
+     void RealTimeHit (Baloon&amp; a){
+        cout &lt;&lt; &quot;Table hit by Baloon and baloon stuck in Jam!&quot; &lt;&lt; &quot;\n&quot;;
+    }
+};
+
+class Window : public Surface
+{
+     void hit (Sphere&amp; s)
+    {
+        s.RealTimeHit(*this);
+    }
+
+     void RealTimeHit (Ball&amp; a){
+        cout &lt;&lt; &quot;Window hit by Ball. Oops!&quot; &lt;&lt; &quot;\n&quot;;
+    }
+
+     void RealTimeHit (Baloon&amp; a){
+        cout &lt;&lt; &quot;Window hit by baloon! Nothing serious!&quot; &lt;&lt; &quot;\n&quot;; 
+     } 
+   }; 
+
+ int main( ) 
+ {  
+    Sphere * a1 = new Ball(); 
+    Sphere * a2 = new Baloon(); 
+    Surface * b1 = new Table(); 
+    Surface * b2 = new Window(); 
+
+    a1-&gt;hit(*b1); // Ball &gt; Table
+    a2-&gt;hit(*b2); // Baloon &gt; Window
+    a1-&gt;hit(*b2); // Ball &gt; Window
+    a2-&gt;hit(*b1); // Baloon &gt; Table
+
+    return 0;
+}</code></pre>
+<p>
+Result:
+<blockquote>Table hit by Ball but survived
+Window hit by baloon! Nothing serious!
+Window hit by Ball. Oops!
+Table hit by Baloon and baloon stuck in Jam!</blockquote>
+</p>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. Entirely my own work — text, code and screenshots. Reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>.</footer>
+</body>
+</html>

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visitor Pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Adds new operations to existing object structure without modifying that structure. Separates an algorithm from an object structure on which it operates">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Visitor Pattern</h1>
+<p class="meta">Originally published 2016-05-13 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>Adds new operations to existing object structure without modifying that structure. Separates an algorithm from an object structure on which it operates.</p>
+<p>Example:<br />
+An example would be a guest visiting a household. A guest talks to each family member, but he talks to each one in a different way – he will not talk the same with adults as he will with children. The guest has indispensable knowledge of how to talk to certain household member. This knowledge however does not have an impact on the household.</p>
+<h3>2. UML class diagram</h3>
+<p><img src="http://www.c-jump.com/CIS75/Week11/const_images/Visitor_UML_Class_Diagram.png" alt="Visitor Design Pattern" /></p>
+<p>The Visitor can visit objects that dont have a common parent class.</p>
+<p>Although the ConcreteElement nodes may represent unrelated classes, they all should derive from a common Element base.</p>
+<p>The client instantiates a ConcreteVisitor.</p>
+<p>The traversal algorithm invokes Element::accept(Visitor) for each node.</p>
+<p>The ConcreteElement calls Visitor::visit(ConcreteElement).</p>
+<p>The ConcreteVisitor now uses the ConcreteElement interface to carry out node-specific tasks.</p>
+<h3>3. Pros</h3>
+<ul>
+<li>cleaner code – factors out type specific event handling from classes and centralises it in a Visitor</li>
+<li>easy to add a new “operation” for all Visitable classes – an operation is implemented as a Visitor subclass with a handler method for each Visitable object type </li>
+<li>can traverse multiple object types in the same traversal – unlike Iterator which can only traverse one type at a time </li>
+<li>useful for running a variety of reports – without Visitor every class that you’d want to report on would have to have a custom method per report</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>if a new Visitable class is added, all Visitor subclasses have to be extended to support it </li>
+<li>might break encapsulation - the Visitor needs access to the elements details  </li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+// From http://www.patterns.pl/visitor.html
+    #include &lt;iostream&gt;
+    #include &lt;vector&gt;
+    using namespace std;
+    class ConcreteElementA;
+    class ConcreteElementB;
+    class Visitor
+    {
+    public:
+      virtual void visitConcreteElementA(ConcreteElementA&amp; visitable) = 0;
+      virtual void visitConcreteElementB(ConcreteElementB&amp; visitable) = 0;
+    };
+    class ConcreteVisitor : public Visitor
+    {
+    public:
+      void visitConcreteElementA(ConcreteElementA&amp; visitable) override
+      {
+        cout &lt;&lt; &quot;ConcreteVisitor perform opetation on ConcreteElementA&quot; &lt;&lt; endl;
+      }
+      void visitConcreteElementB(ConcreteElementB&amp; visitable) override
+      {
+        cout &lt;&lt; &quot;ConcreteVisitor perform operation on ConcreteElementB&quot; &lt;&lt; endl;
+      }
+    	
+    };
+    class Visitable
+    {
+    public:
+      virtual void accept(Visitor&amp; visitor) = 0;
+    };
+    class ConcreteElementA : public Visitable
+    {
+    public:
+      void accept(Visitor &amp;visitor) override { visitor.visitConcreteElementA(*this); }
+    };
+    class ConcreteElementB : public Visitable
+    {
+    public:
+      void accept(Visitor &amp;visitor) override { visitor.visitConcreteElementB(*this); }
+    };
+    // Composite in practice
+    class ObjectStructure : public Visitable
+    {
+      vector&lt;Visitable*&gt; elements;
+    public:
+      ObjectStructure() {}
+      void addElement(Visitable *element) { elements.push_back(element); }
+      void accept(Visitor &amp;visitor) override
+      {
+        for (auto &amp;e : elements)
+        {
+          e-&gt;accept(visitor);
+        }
+      }
+    };
+    int main()
+    {
+      ConcreteVisitor visitor;
+      ConcreteElementA elementA;
+      ConcreteElementB elementB;
+      ObjectStructure objectStructure;
+      objectStructure.addElement(&amp;elementA);
+      objectStructure.addElement(&amp;elementB);
+      objectStructure.accept(visitor);
+      return 0;
+    }
+</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

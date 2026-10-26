@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mediator pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage In software engineering, the mediator pattern defines an object that encapsulates how a set of objects interact. This pattern is considered to be a beh">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Mediator pattern</h1>
+<p class="meta">Originally published 2016-04-21 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>In software engineering, the mediator pattern defines an object that encapsulates how a set of objects interact. This pattern is considered to be a behavioral pattern due to the way it can alter the programs running behavior.</p>
+<p>Usually a program is made up of a large number of classes. So the logic and computation is distributed among these classes. However, as more classes are developed in a program, especially during maintenance and/or refactoring, the problem of communication between these classes may become more complex. This makes the program harder to read and maintain. Furthermore, it can become difficult to change the program, since any change may affect code in several other classes.</p>
+<p>With the mediator pattern, communication between objects is encapsulated with a mediator object. Objects no longer communicate directly with each other, but instead communicate through the mediator. This reduces the dependencies between communicating objects, thereby lowering the coupling.</p>
+<h3>2. UML class diagram</h3>
+<p><img src="http://patterns.pl/png/mediatorclass.png" alt="Mediator UML class diagram:" /><br />
+<img src="http://patterns.pl/png/mediatorseq.png" alt="Mediator UML sequence diagram:" /></p>
+<h3>3. Pros</h3>
+<ul>
+<li>promotes a loose coupling between the Colleagues – instead of a Many:Many 
+publish, it’s a Many:1 (Colleagues to Mediator) followed by a 1:Many (Mediator to Colleagues) </li>
+<li>promotes reuse – Colleagues aren’t bogged down with relationship 
+management code so can be reused in other circumstances 
+</li>
+<li>centralizes relationship management in the Mediator 
+</ul>
+</li>
+<h3>4. Cons</h3>
+<ul>
+<li>the Mediator can become very complex and difficult to maintain </li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+// From http://patterns.pl/mediator.html
+    #include &lt;iostream&gt;
+    #include &lt;string&gt;
+    #include &lt;map&gt;
+    using namespace std;
+    class Mediator
+    {
+    public:
+      virtual void send(const string&amp; id, const string&amp; message) = 0;
+    };
+    class Colleague
+    {
+      Mediator* mediator;
+      string id;
+    public:
+      Colleague(const string&amp; cid) { id = cid; }
+      string getId() { return id; }
+      void registerMediator(Mediator &amp;m) { mediator = &amp;m; }
+      void receive(const string &amp; msg)
+      {
+        cout &lt;&lt; &quot;Message received by &quot; + id + &quot;: &quot; + msg &lt;&lt; endl;
+      }
+      void send(const string &amp; ids, const string &amp; msg) 
+      {
+        cout &lt;&lt; id + &quot; send message to &quot; + ids + &quot; : &quot; + msg &lt;&lt; endl;
+        mediator-&gt;send(ids, msg);
+      }
+    };
+    class ConcreteMediator : public Mediator
+    {
+      map&lt;string, Colleague*&gt; colleagues;
+      bool isRegistered(string id)
+      {
+        return colleagues.find(id) != colleagues.end();
+      }
+    public:
+      void registerColleague(Colleague&amp; c)
+      {
+        if (!isRegistered(c.getId()))
+        {
+          c.registerMediator(*this);
+          colleagues[c.getId()] = &amp;c;
+        }
+      }
+      void send(const string&amp; id, const string&amp; message) override
+      {
+        if (isRegistered(id))
+        {
+          Colleague *c = colleagues[id];
+          c-&gt;receive(message);
+        }
+      }
+    };
+    int main()
+    {
+      Colleague peter(&quot;Peter&quot;);
+      Colleague paul(&quot;Paul&quot;);
+      Colleague kate(&quot;Kate&quot;);
+      ConcreteMediator mediator;
+      mediator.registerColleague(peter);
+      mediator.registerColleague(paul);
+      mediator.registerColleague(kate);
+      peter.send(&quot;Paul&quot;, &quot;wu&quot;); //whats up?
+      paul.send(&quot;Peter&quot;, &quot;aas&quot;); //alive and smiling
+      kate.send(&quot;Paul&quot;, &quot;diku&quot;); //do I know you?
+      paul.send(&quot;Kate&quot;, &quot;ydkm&quot;); //you dont know me
+      return 0;
+    }</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

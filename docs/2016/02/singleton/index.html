@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Singleton · Boris Ivanov</title>
+<meta name="description" content="1. Usage Class which has Single Instance and Global access hrough all application. 2. UML class diagram 3. Pros Controlled access to single object. 4. Cons Can ">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Singleton</h1>
+<p class="meta">Originally published 2016-02-22 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>Class which has Single Instance and Global access hrough all application.</p>
+<h3>2. UML class diagram</h3>
+<p><img src="http://yuml.me/diagram/scruffy/class/[Singleton|+static getInstance():Singleton|-static instance : Singleton|-Singleton():void]"></p>
+<h3>3. Pros</h3>
+<p>Controlled access to single object.</p>
+<h3>4. Cons</h3>
+<p>Can be harmful in big complex system which need to be scaled.<br />
+Can complicate TDD based programming.</p>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+class Singleton{
+private:
+    Singleton(){};
+public:
+    static Singleton&amp; getInstance(){
+        static Singleton instance;
+        return instance;
+    }
+};</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

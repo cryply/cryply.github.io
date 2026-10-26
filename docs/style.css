@@ -1,0 +1,54 @@
+:root { --fg:#1b1b1b; --muted:#666; --bg:#fdfdfc; --accent:#8a3324; --line:#e3e0da;
+        --code-bg:#f5f3ef; }
+@media (prefers-color-scheme: dark) { :root {
+  --fg:#e6e4e0; --muted:#9a968e; --bg:#16161a; --accent:#d98b6a; --line:#2e2e34;
+  --code-bg:#1e1e24; } }
+* { box-sizing:border-box; }
+/* Кегль и ширина подобраны под широкий монитор: Georgia мелкая в своём
+   кегле, и 16px в колонке на 46rem читались тяжело. Теперь базовый
+   размер плавает от 17px на телефоне до 22px на большом экране, а
+   колонка — 52rem, то есть растёт вместе со шрифтом.
+   КРУТИТЬ ЗДЕСЬ, если захочется иначе: верхняя граница в clamp() —
+   размер текста, max-width — ширина колонки. Больше 56rem при таком
+   кегле строка становится длинной и глаз начинает терять начало. */
+body { margin:0 auto; padding:3rem 1.2rem 6rem; max-width:52rem; background:var(--bg);
+  color:var(--fg);
+  font:clamp(17px, 0.95rem + 0.45vw, 22px)/1.7 Georgia,"Iowan Old Style",serif;
+  -webkit-text-size-adjust:100%; }
+a { color:var(--accent); }
+header.site h1 { margin:0 0 .25rem; font-size:1.8rem; letter-spacing:-.01em; }
+header.site { margin-bottom:2.5rem; }
+header.site p { margin:0; color:var(--muted); font-size:1rem; }
+header.site p.elsewhere { margin-top:.7rem; font-size:.95rem; }
+nav.back { margin-bottom:1.5rem; font-size:.95rem; }
+section.group { margin:0 0 2.5rem; }
+section.group h2 { font-size:1.25rem; margin:0 0 .35rem; }
+section.group > p { margin:0 0 1.1rem; color:var(--muted); font-size:.97rem; }
+ul.posts { list-style:none; margin:0; padding:0; }
+ul.posts li { display:flex; gap:1rem; padding:.5rem 0; border-bottom:1px solid var(--line); }
+ul.posts time { flex:0 0 6.4rem; color:var(--muted); font-size:.88rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; padding-top:.2rem; }
+article h1 { font-size:1.75rem; line-height:1.25; margin:0 0 .35rem; }
+article h3 { font-size:1.2rem; margin:2.2rem 0 .6rem; }
+.meta { color:var(--muted); font-size:.88rem; margin:0 0 2.2rem;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+article img { max-width:100%; height:auto; display:block; margin:1.2rem 0;
+  border:1px solid var(--line); border-radius:3px; }
+pre { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:1rem 1.1rem; overflow-x:auto; font-size:.86rem; line-height:1.55; }
+pre code { font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+:not(pre) > code { background:var(--code-bg); padding:.1em .35em; border-radius:3px;
+  font-size:.88em; }
+blockquote { margin:1.2rem 0; padding-left:1rem; border-left:3px solid var(--line);
+  color:var(--muted); }
+footer.site { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--line);
+  color:var(--muted); font-size:.9rem; line-height:1.55; }
+.note { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:.9rem 1.1rem; font-size:.95rem; color:var(--muted); margin:0 0 2.2rem; }
+.comments { margin-top:3.5rem; border-top:1px solid var(--line); padding-top:1.5rem; }
+.comments h2 { font-size:1.2rem; margin:0 0 1rem; }
+.comment { margin:0 0 1.3rem; font-size:1rem; }
+.comment.reply { margin-left:1.5rem; padding-left:1rem; border-left:2px solid var(--line); }
+.comment .who { font-size:.85rem; color:var(--muted);
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+.comment p { margin:.3rem 0 0; }

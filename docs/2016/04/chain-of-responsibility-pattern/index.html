@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chain of responsibility pattern · Boris Ivanov</title>
+<meta name="description" content="1. Usage Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request. Chain the receiving objects and p">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Chain of responsibility pattern</h1>
+<p class="meta">Originally published 2016-04-08 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<ul>
+<li>Avoid coupling the sender of a request to its receiver by giving more than one object a chance to handle the request. Chain the receiving objects and pass the request along the chain until an object handles it. [GoF, p223]</li>
+<li>Launch-and-leave requests with a single processing pipeline that contains many possible handlers.</li>
+<li>An object-oriented linked list with recursive traversal.</li>
+</ul>
+<h3>2. UML class diagram</h3>
+<p><img src="http://cpp-reference.ru/images/patterns/demo-chain-of-responsibility-1.gif" alt="Chain of Responsibility" /><br />
+<img src="http://cpp-reference.ru/images/patterns/demo-chain-of-responsibility-2.gif" alt="Chain of Responsibility" /><br />
+<img src="http://cpp-reference.ru/images/patterns/uml-chain-of-responsibility.gif" alt="Chain of Responsibility" /></p>
+<h3>3. Pros</h3>
+<ul>
+<li>Decouples the sender of the request and its receivers.</li>
+<li>Simplifies your object as it doesn’t have to know about the chain structure and keep direct references to its members.</li>
+<li>Allows you to add or remove responsibilities dynamically by changing the members or order of the chain.</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li> Hard to observe the run-time characteristics and debug</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+
+// From http://cpp-reference.ru/patterns/behavioral-patterns/chain-of-responsibility/
+#include &lt;iostream&gt;
+#include &lt;vector&gt;
+#include &lt;ctime&gt;
+using namespace std;
+ 
+class Base
+{
+    // 1. Указатель &quot;next&quot; в базовом классе
+    Base *next;
+  public:
+    Base()
+    {
+        next = 0;
+    }
+    void setNext(Base *n)
+    {
+        next = n;
+    }
+    void add(Base *n)
+    {
+        if (next)
+          next-&gt;add(n);
+        else
+          next = n;
+    }
+    // 2. Метод базового класса, делегирующий запрос next-объекту
+    virtual void handle(int i)
+    {
+        next-&gt;handle(i);
+    }
+};
+ 
+class Handler1: public Base
+{
+  public:
+     /*virtual*/void handle(int i)
+    {
+        if (rand() % 3)
+        {
+            // 3. 3 из 4 запросов не обрабатываем
+            cout &lt;&lt; &quot;H1 passsed &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+            // 3. и делегируем базовому классу
+            Base::handle(i);        }
+        else
+          cout &lt;&lt; &quot;H1 handled &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+    }
+};
+ 
+class Handler2: public Base
+{
+  public:
+     /*virtual*/void handle(int i)
+    {
+        if (rand() % 3)
+        {
+            cout &lt;&lt; &quot;H2 passsed &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+            Base::handle(i);
+        }
+        else
+          cout &lt;&lt; &quot;H2 handled &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+    }
+};
+ 
+class Handler3: public Base
+{
+  public:
+     /*virtual*/void handle(int i)
+    {
+        if (rand() % 3)
+        {
+            cout &lt;&lt; &quot;H3 passsed &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+            Base::handle(i);
+        }
+        else
+          cout &lt;&lt; &quot;H3 handled &quot; &lt;&lt; i &lt;&lt; &quot;  &quot;;
+    }
+};
+ 
+int main()
+{
+  srand(time(0));
+  Handler1 root;
+  Handler2 two;
+  Handler3 thr;
+  root.add(&amp;two);
+  root.add(&amp;thr);
+  thr.setNext(&amp;root);
+  for (int i = 1; i &lt; 10; i++)
+  {
+    root.handle(i);
+    cout &lt;&lt; \n;
+  }
+}</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Builder · Boris Ivanov</title>
+<meta name="description" content="1. Usage To implement reusable mechanize of polymorphic pipeline to generate step by step final complex product. For example function &quot;save as&quot; document - as HT">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Builder</h1>
+<p class="meta">Originally published 2016-02-18 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>To implement reusable mechanize of polymorphic pipeline to generate step by step final complex product.
+For example function "save as" document - as HTML, RTF, PDF. each plugin for different format will have its own way to serialize - table, image or title objects.</p>
+<h3>2. UML class diagram</h3>
+<p><a href="../../../wp-content/uploads/2016/02/Builder-2x.png" rel="attachment wp-att-317"><img class="alignnone wp-image-317" src="../../../wp-content/uploads/2016/02/Builder-2x.png" alt="Builder-2x" /></a><br />
+Source: https://sourcemaking.com/design_patterns/builder</p>
+<h3>3. Pros</h3>
+<h3>4. Cons</h3>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+//Program tested on Microsoft Visual Studio 2008 - Zahid Ghadialy
+//Builder is part of Creational Patterns 
+//Creational Patterns deal with initializing and configuring classes and objects
+//Builder Separates object construction from its representation 
+
+//We will take an example of creating Vehicles using Vehicle class.
+//The VehicleBuilder is the abstract interface for creating the parts of Vehicle
+//Different ConcreteBuilder classes are used to construct the final Product
+//The Shop class is the Director that defines the sequence of construction
+//The final product, Vehicle class shows the different type of Vehicle 
+//constructed  and consists of different parts that can be assembles in final result
+// From : http://advancedcppwithexamples.blogspot.de/2010/08/c-example-for-builder-design-pattern.html
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;map&gt;
+
+using namespace std;
+
+//The Product class
+class Vehicle
+{
+public:
+  Vehicle(const string&amp; vehicleType) : vehicleType_(vehicleType)
+  {
+  }
+
+  void SetPart(const string&amp; partName, const string&amp; partValue)
+  {
+    parts_[partName] = partValue;
+  }
+
+  const string&amp; GetpartValue(const string&amp; partName)
+  {
+    map&lt;string, string&gt;::const_iterator it;
+    it = parts_.find(partName);
+    if(it != parts_.end())
+      return it-&gt;second;
+    else
+    {
+      parts_[partName] = &quot;Not found&quot;;
+      return parts_[partName];
+    }
+  }
+
+  void const Show(void)
+  {
+    cout &lt;&lt; &quot;\n---------------------------&quot; &lt;&lt; endl;
+    cout &lt;&lt; &quot;Vehicle Type : &quot; &lt;&lt; vehicleType_ &lt;&lt; endl;
+    cout &lt;&lt; &quot;Frame        : &quot; &lt;&lt; parts_&amp;#091;&quot;frame&quot;&amp;#093; &lt;&lt; endl;
+    cout &lt;&lt; &quot;Engine       : &quot; &lt;&lt; parts_&amp;#091;&quot;engine&quot;&amp;#093; &lt;&lt; endl;
+    cout &lt;&lt; &quot;#Wheels      : &quot; &lt;&lt; parts_&amp;#091;&quot;wheels&quot;&amp;#093; &lt;&lt; endl;
+    cout &lt;&lt; &quot;#Doors       : &quot; &lt;&lt; parts_&amp;#091;&quot;doors&quot;&amp;#093; &lt;&lt; endl;
+  }
+
+private:
+  Vehicle(); //Default constructor is private so not allowed to be used
+  string vehicleType_;
+  map&lt;string, string&gt; parts_;
+};
+
+//Create an abstract Builder class
+class VehicleBuilder
+{
+public:
+  //Default constructor wont work as pointer needs init
+  VehicleBuilder()
+  {
+    vehicle = NULL;
+  }
+  //Destructor made virtual
+  virtual ~VehicleBuilder()
+  {
+    if(vehicle)
+    {
+      delete vehicle;
+      vehicle = NULL;
+    }
+  }
+  const Vehicle&amp; getVehicle(void)
+  {
+    return *vehicle;
+  }
+  virtual void BuildFrame() = 0;
+  virtual void BuildEngine() = 0;
+  virtual void BuildWheels() = 0;
+  virtual void BuildDoors() = 0;
+protected:
+  Vehicle* vehicle;
+};
+
+//The Concrete Builder #1 class
+class MotorCycleBuilder : public VehicleBuilder
+{
+public:
+  MotorCycleBuilder()
+  {
+    vehicle = new Vehicle(&quot;MotorCycle&quot;);
+  }
+  void BuildFrame()
+  {
+    vehicle-&gt;SetPart(&quot;frame&quot;, &quot;MotorCycle Frame&quot;);
+  }
+  virtual void BuildEngine()
+  {
+    vehicle-&gt;SetPart(&quot;engine&quot;, &quot;500 cc&quot;);
+  }
+  virtual void BuildWheels()
+  {
+    vehicle-&gt;SetPart(&quot;wheels&quot;, &quot;2&quot;);
+  }
+  virtual void BuildDoors()
+  {
+    vehicle-&gt;SetPart(&quot;doors&quot;, &quot;0&quot;);
+  }
+};
+
+//The Concrete Builder #2 class
+class CarBuilder : public VehicleBuilder
+{
+public:
+  CarBuilder()
+  {
+    vehicle = new Vehicle(&quot;Car&quot;);
+  }
+  void BuildFrame()
+  {
+    vehicle-&gt;SetPart(&quot;frame&quot;, &quot;Car Frame&quot;);
+  }
+  virtual void BuildEngine()
+  {
+    vehicle-&gt;SetPart(&quot;engine&quot;, &quot;2500 cc&quot;);
+  }
+  virtual void BuildWheels()
+  {
+    vehicle-&gt;SetPart(&quot;wheels&quot;, &quot;4&quot;);
+  }
+  virtual void BuildDoors()
+  {
+    vehicle-&gt;SetPart(&quot;doors&quot;, &quot;4&quot;);
+  }
+};
+
+//The Concrete Builder #3 class
+class ScooterBuilder : public VehicleBuilder
+{
+public:
+  ScooterBuilder()
+  {
+    vehicle = new Vehicle(&quot;Scooter&quot;);
+  }
+  void BuildFrame()
+  {
+    vehicle-&gt;SetPart(&quot;frame&quot;, &quot;Scooter Frame&quot;);
+  }
+  virtual void BuildEngine()
+  {
+    vehicle-&gt;SetPart(&quot;engine&quot;, &quot;50 cc&quot;);
+  }
+  virtual void BuildWheels()
+  {
+    vehicle-&gt;SetPart(&quot;wheels&quot;, &quot;2&quot;);
+  }
+  virtual void BuildDoors()
+  {
+    vehicle-&gt;SetPart(&quot;doors&quot;, &quot;0&quot;);
+  }
+};
+
+//The Director class
+class Shop
+{
+public:
+  void Construct(VehicleBuilder* vehicleBuilder)
+  {
+    vehicleBuilder-&gt;BuildFrame();
+    vehicleBuilder-&gt;BuildEngine();
+    vehicleBuilder-&gt;BuildWheels();
+    vehicleBuilder-&gt;BuildDoors();
+  }
+};
+
+int main()
+{
+  VehicleBuilder *builder = NULL;
+
+  Shop shop; //New Instance of class created locally.
+
+  //Construct vehicle 1 and destroy instance when done
+  builder = new ScooterBuilder();
+  shop.Construct(builder);
+  (const_cast&lt;Vehicle&amp;&gt;(builder-&gt;getVehicle())).Show();
+  delete builder;
+
+  //Construct vehicle 2 and destroy instance when done
+  builder = new CarBuilder();
+  shop.Construct(builder);
+  (const_cast&lt;Vehicle&amp;&gt;(builder-&gt;getVehicle())).Show();
+  delete builder;
+
+  //Construct vehicle 3 and destroy instance when done
+  builder = new MotorCycleBuilder();
+  shop.Construct(builder);
+  (const_cast&lt;Vehicle&amp;&gt;(builder-&gt;getVehicle())).Show();
+  delete builder;
+
+  return 0;
+}</code></pre>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. My own text and code: reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>. Third-party code and diagrams remain with their authors and are credited where they appear.</footer>
+</body>
+</html>

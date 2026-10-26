@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facade · Boris Ivanov</title>
+<meta name="description" content="1. Usage When sub-system very complex and has many subsystems it make sense to unify access to it by providing single interface called facade. Facade isolate su">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../../style.css?v=1ff8440c">
+</head>
+<body>
+<nav class="back"><a href="../../../">← Index</a></nav>
+<article>
+<h1>Facade</h1>
+<p class="meta">Originally published 2016-03-26 · Boris Ivanov</p>
+<h3>1. Usage</h3>
+<p>When sub-system very complex and has many subsystems it make sense to unify access to it by providing single interface called facade.<br />
+Facade isolate subsystems from direct calls and such way reducing dependency between modules and improve re-usability .</p>
+<h3>2. UML class diagram</h3>
+<figure><img src="../../../wp-content/uploads/2016/03/facade.jpg" alt="facade uml diagram" class="size-full wp-image-459" />
+<figcaption><a href="../../../wp-content/uploads/2016/03/facade.jpg" rel="attachment wp-att-459"></a> facade uml diagram</figcaption>
+</figure>
+<h3>3. Pros</h3>
+<ul>
+<li>
+It helps to use subsystem as only single system call used to interact with many subsystems. Which in turn improve recompilation in case subsystem was modified.
+</li>
+<li>
+Complex system become layered - which improve usage and maintenance. Dependency between libraries reduced.</li>
+</ul>
+<h3>4. Cons</h3>
+<ul>
+<li>You have to maintain Facade as sub-system will evolve.</li>
+<li>Overuse may introduce unnecessary layers.</li>
+</ul>
+<h3>5. Source code</h3>
+<pre><code class="language-cpp">
+//Program tested on Microsoft Visual Studio 2008 - Zahid Ghadialy
+//Façade is part of Structural Patterns 
+//Structural Patterns deal with decoupling the interface and implementation of classes and objects
+//A Facade is single class that represents an entire subsystem  
+ 
+//The example we consider here is a case of a customer applying for mortgage
+//The bank has to go through various checks to see if Mortgage can be approved for the customer
+//The facade class goes through all these checks and returns if the morgage is approved
+
+#include&lt;iostream&gt;
+#include&lt;string&gt;
+
+using namespace std;
+ 
+// Customer class
+class Customer
+{
+public:
+  Customer (const string&amp; name) : name_(name){}
+  const string&amp; Name(void)
+  {
+    return name_;
+  }
+private:
+  Customer(); //not allowed
+  string name_;
+};
+ 
+// The Subsystem ClassA class
+class Bank
+{
+public:
+  bool HasSufficientSavings(Customer c, int amount)
+  {
+    cout &lt;&lt; &quot;Check bank for &quot; &lt;&lt;c.Name()&lt;&lt;endl;
+    return true;
+  }
+};
+ 
+// The Subsystem ClassB class
+class Credit
+{
+public:
+  bool HasGoodCredit(Customer c, int amount)
+  {
+    cout &lt;&lt; &quot;Check credit for &quot; &lt;&lt;c.Name()&lt;&lt;endl;
+    return true;
+  }
+};
+ 
+// The Subsystem ClassC class
+class Loan
+{
+public:
+  bool HasGoodCredit(Customer c, int amount)
+  {
+    cout &lt;&lt; &quot;Check loans for &quot; &lt;&lt;c.Name()&lt;&lt;endl;
+    return true;
+  }
+};
+ 
+// The Facade class
+class Mortgage
+{
+public:
+  bool IsEligible(Customer cust, int amount)
+  {
+    cout &lt;&lt; cust.Name() &lt;&lt; &quot; applies for a loan for $&quot; &lt;&lt; amount &lt;&lt;endl;
+    bool eligible = true;
+ 
+    eligible = bank_.HasSufficientSavings(cust, amount);
+ 
+    if(eligible)
+      eligible = loan_.HasGoodCredit(cust, amount);
+ 
+    if(eligible)
+      eligible = credit_.HasGoodCredit(cust, amount);
+ 
+    return eligible;
+  }
+ 
+private:
+  Bank bank_;
+  Loan loan_;
+  Credit credit_;
+};
+ 
+//The Main method
+int main()
+{
+  Mortgage mortgage;
+  Customer customer(&quot;Brad Pitt&quot;);
+ 
+  bool eligible = mortgage.IsEligible(customer, 1500000);
+ 
+  cout &lt;&lt; &quot;\n&quot; &lt;&lt; customer.Name() &lt;&lt; &quot; has been &quot; &lt;&lt; (eligible ? &quot;Approved&quot; : &quot;Rejected&quot;) &lt;&lt; endl;
+ 
+  return 0;
+}</code></pre>
+<p>Available at <a href="http://ideone.com/tK4Nl0">IdeOne</a><br />
+<script src="http://ideone.com/e.js/tK4Nl0" type="text/javascript" ></script></p>
+</article>
+<footer class="site">Written 2015–2016. Republished as a static archive — text, dates and comments unchanged.<br>© 2015–2026 Boris Ivanov. Entirely my own work — text, code and screenshots. Reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>.</footer>
+</body>
+</html>
