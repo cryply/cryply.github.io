@@ -52,3 +52,10 @@ footer.site { margin-top:4rem; padding-top:1.2rem; border-top:1px solid var(--li
 .comment .who { font-size:.85rem; color:var(--muted);
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 .comment p { margin:.3rem 0 0; }
+article table { border-collapse:collapse; margin:1.2rem 0; font-size:.88rem; width:100%;
+  display:block; overflow-x:auto; }
+article th, article td { border-bottom:1px solid var(--line); padding:.35rem .7rem;
+  text-align:left; white-space:nowrap; }
+article th { color:var(--muted); font-weight:normal;
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
+article td.num, article th.num { text-align:right; font-variant-numeric:tabular-nums; }

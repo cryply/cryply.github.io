@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Does the code compile? Five local models on a DGX Spark · Boris Ivanov</title>
+<meta name="description" content="Six programming tasks in Rust, C++, Python, Go, TypeScript and React, five open-weight models on one GB10 box, scored by compiler and tests instead of by eye.">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../style.css?v=b1034d82">
+</head>
+<body>
+<nav class="back"><a href="../../">← Index</a></nav>
+<article>
+<h1>Does the code compile? Five local models on a DGX Spark</h1>
+<p class="meta">2026-10-27 · Boris Ivanov</p>
+<p>Most "DGX Spark benchmark" posts measure tokens per second. That answers
+<em>how fast</em>, not <em>which model to install</em>. For a developer the second question
+reduces to something a machine can check: does the code compile, and do the
+tests pass?</p>
+<h2>Setup</h2>
+<ul>
+<li>ASUS Ascent GX10 (NVIDIA GB10, 128 GB unified memory)</li>
+<li>Ollama for models that fit side by side, <code>llama-server</code> (llama.cpp) for the rest</li>
+<li>Harness: <a href="https://github.com/cryply/llm-compile-bench">llm-compile-bench</a>: one prompt per
+  language with a fixed signature, hidden tests, <code>cargo</code> / <code>g++</code> / <code>pytest</code> /
+  <code>go test</code> / <code>tsc</code> as judges</li>
+</ul>
+<h2>Models</h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Quant</th>
+<th>Size</th>
+<th>Runtime</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Nemotron 3.5 Lightning 30B-A3B</td>
+<td>IQ4_NL</td>
+<td>17 GB</td>
+<td>Ollama</td>
+</tr>
+<tr>
+<td>Qwen3.8-27B</td>
+<td>Q4_K_M</td>
+<td>18 GB</td>
+<td>Ollama</td>
+</tr>
+<tr>
+<td>gpt-oss-120b</td>
+<td>MXFP4</td>
+<td>65 GB</td>
+<td>Ollama</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B-A3B ("qwopus36")</td>
+<td>Q6 + MTP</td>
+<td>~30 GB</td>
+<td>llama.cpp</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Flash 0731</td>
+<td>UD-IQ2_XXS</td>
+<td>91 GB</td>
+<td>llama.cpp</td>
+</tr>
+</tbody>
+</table>
+<h2>Results</h2>
+<p>Six tasks, five runs per model (30 attempts each), temperature 0.2, 32k
+completion tokens. "Wall-to-pass" is the average time over the attempts that
+passed: the number that matters when you are waiting for a usable answer.
+"Flaky" lists tasks that passed in some runs and failed in others.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Compiles</th>
+<th>Tests pass</th>
+<th>Wall median</th>
+<th>Wall min..max</th>
+<th>Wall-to-pass</th>
+<th>tok/s</th>
+<th>Flaky tasks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Qwen3.8-27B</td>
+<td>30/30</td>
+<td>28/30</td>
+<td>54 s</td>
+<td>15..134 s</td>
+<td>57 s</td>
+<td>31</td>
+<td>go_worker_pool 4/5, rust_iso8601 4/5</td>
+</tr>
+<tr>
+<td>gpt-oss-120b</td>
+<td>30/30</td>
+<td>26/30</td>
+<td>22 s</td>
+<td>10..63 s</td>
+<td>27 s</td>
+<td>39</td>
+<td>go_worker_pool 1/5</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Flash</td>
+<td>26/30</td>
+<td>25/30</td>
+<td>118 s</td>
+<td>55..1638 s</td>
+<td>169 s</td>
+<td>20</td>
+<td>go_worker_pool 3/5, react_counter 4/5, rust_iso8601 3/5</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B-A3B</td>
+<td>18/30</td>
+<td>17/30</td>
+<td>22 s</td>
+<td>11..326 s</td>
+<td>24 s</td>
+<td>95</td>
+<td>rust_iso8601 2/5</td>
+</tr>
+<tr>
+<td>Nemotron 3.5 Lightning</td>
+<td>18/30</td>
+<td>15/30</td>
+<td>42 s</td>
+<td>13..233 s</td>
+<td>34 s</td>
+<td>86</td>
+<td>cpp_lru 2/5, go_worker_pool 2/5, ts_debounce 1/5</td>
+</tr>
+</tbody>
+</table>
+<p>The first single run told a different story: gpt-oss-120b went 6 for 6 and
+looked like the clear winner. Over five runs its Go worker pool passed once in
+five. Qwen3.8-27B, second on that first run, is the most reliable model here.
+The Go task is the one that separates the field: every model is flaky on it,
+and it is the only task about concurrency.</p>
+<h2>A first look, before the harness</h2>
+<p>The same one-line prompt, <em>write a Rust function that parses an ISO-8601
+date</em>, sent by hand to four models:</p>
+<pre><code class="language-text">Nemotron 3.5 Lightning   93 tok/s    27 s   answered in English, date-only
+gpt-oss-120b             44 tok/s    95 s   invented &quot;chrono 0.5&quot;, missing dep
+Qwen3.8-27B              30 tok/s    73 s   clean; one missing `use Datelike`
+DeepSeek V4 Flash        17 tok/s   659 s   best code, 11k tokens of thinking
+</code></pre>
+<p>Capping DeepSeek's reasoning at 2048 tokens made it four times faster, and
+its answer stopped compiling. Thinking is where its quality comes from.</p>
+<h2>Takeaways</h2>
+<p><strong>Tokens per second ranks the models backwards.</strong> The two fastest generators,
+Qwen3.6 at 95 tok/s and Nemotron at 86, pass about half the attempts. The two
+slowest-by-token models are the two most reliable. If you only benchmark
+throughput, you install the wrong model.</p>
+<p><strong>Qwen3.8-27B is the quality pick, gpt-oss-120b the balance pick.</strong> 28 of 30
+at 17 GB on disk, leaving room for a second model next to it. gpt-oss is twice
+as fast to a passing answer (27 s against 57 s) at 26 of 30, and it is the one
+I would leave loaded for daily work, as long as the task is not concurrency
+in Go.</p>
+<p><strong>DeepSeek V4 Flash is the strongest reasoner and the worst daily driver.</strong>
+It solves what the others cannot, at five to ten times the wait, and its
+run-to-run spread (55 s to 27 minutes on the same prompt) is larger than the
+gap between the other models. Capping its reasoning makes it fast and wrong.</p>
+<p><strong>The small MoE models fail on Rust and Go specifically.</strong> Python, TypeScript
+and React mostly pass; the type system and the concurrency model are where
+they come apart.</p>
+<p><strong>Half of the first run's failures were mine, not the models'.</strong> Missing
+toolchains on the box (every Rust, Go and TypeScript task would have scored
+zero), code returned without Markdown fences that the harness refused to read,
+a token budget set too low for reasoning models. A benchmark harness needs the
+same scepticism as the models it judges; a preflight check that the judges
+exist is now the first thing the script does.</p>
+<p><strong>One run is not a measurement.</strong> The single run had gpt-oss at 6/6 and Qwen
+3.8 second. Five runs reversed them. Report the spread, not the mean.</p>
+</article>
+<footer class="site">© 2026 Boris Ivanov. Entirely my own work — text, code and screenshots. Reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>.</footer>
+</body>
+</html>
