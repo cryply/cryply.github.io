@@ -51,6 +51,35 @@ five. Qwen3.8-27B, second on that first run, is the most reliable model here.
 The Go task is the one that separates the field: every model is flaky on it,
 and it is the only task about concurrency.
 
+## Update, 30 October: 36 tasks
+
+The task set grew from 6 to 36: six per language instead of one. The harness
+learned per-model request timeouts and now records a timed-out request with
+its real wall time instead of dying; two tasks had their tests fixed (one
+test contradicted its own prompt, one tested inputs the prompt never
+promised).
+
+One run of the new set so far, same box, same settings:
+
+| Model | Compiles | Tests pass | Wall median | Wall min..max | Wall-to-pass | tok/s |
+|---|---|---|---|---|---|---|
+| gpt-oss-120b | 32/36 | 30/36 | 24 s | 7..59 s | 27 s | 42 |
+| Qwen3.8-27B | 30/36 | 28/36 | 69 s | 14..253 s | 66 s | 32 |
+| DeepSeek V4 Flash | 29/36 | 27/36 | 208 s | 48..1800 s | 202 s | 15 |
+| Qwen3.6-35B-A3B | 23/36 | 20/36 | 35 s | 9..346 s | 26 s | 96 |
+| Nemotron 3.5 Lightning | 20/36 | 17/36 | 77 s | 10..378 s | 62 s | 88 |
+
+Three caveats. This is a single run, so by this article's own last takeaway
+it is a first look, not a measurement; the five-run spread on the new set is
+next. The numbers are not comparable with the five-run table above, which
+was the old six-task set. And DeepSeek hit the 30-minute request cap on five
+tasks, all counted as failures; a run with a longer cap is pending.
+
+What one run does suggest: on the bigger set the order at the top flips,
+gpt-oss-120b ahead of Qwen3.8-27B, with DeepSeek close behind despite the
+timeouts. The bottom does not move. Tokens per second still ranks the field
+backwards: the two fastest generators, at 96 and 88 tok/s, are last.
+
 ## A first look, before the harness
 
 The same one-line prompt, *write a Rust function that parses an ISO-8601
