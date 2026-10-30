@@ -144,6 +144,82 @@ looked like the clear winner. Over five runs its Go worker pool passed once in
 five. Qwen3.8-27B, second on that first run, is the most reliable model here.
 The Go task is the one that separates the field: every model is flaky on it,
 and it is the only task about concurrency.</p>
+<h2>Update, 30 October: 36 tasks</h2>
+<p>The task set grew from 6 to 36: six per language instead of one. The harness
+learned per-model request timeouts and now records a timed-out request with
+its real wall time instead of dying; two tasks had their tests fixed (one
+test contradicted its own prompt, one tested inputs the prompt never
+promised).</p>
+<p>One run of the new set so far, same box, same settings:</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Compiles</th>
+<th>Tests pass</th>
+<th>Wall median</th>
+<th>Wall min..max</th>
+<th>Wall-to-pass</th>
+<th>tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gpt-oss-120b</td>
+<td>32/36</td>
+<td>30/36</td>
+<td>24 s</td>
+<td>7..59 s</td>
+<td>27 s</td>
+<td>42</td>
+</tr>
+<tr>
+<td>Qwen3.8-27B</td>
+<td>30/36</td>
+<td>28/36</td>
+<td>69 s</td>
+<td>14..253 s</td>
+<td>66 s</td>
+<td>32</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Flash</td>
+<td>29/36</td>
+<td>27/36</td>
+<td>208 s</td>
+<td>48..1800 s</td>
+<td>202 s</td>
+<td>15</td>
+</tr>
+<tr>
+<td>Qwen3.6-35B-A3B</td>
+<td>23/36</td>
+<td>20/36</td>
+<td>35 s</td>
+<td>9..346 s</td>
+<td>26 s</td>
+<td>96</td>
+</tr>
+<tr>
+<td>Nemotron 3.5 Lightning</td>
+<td>20/36</td>
+<td>17/36</td>
+<td>77 s</td>
+<td>10..378 s</td>
+<td>62 s</td>
+<td>88</td>
+</tr>
+</tbody>
+</table>
+<p>Three caveats. This is a single run, so by this article's own last takeaway
+it is a first look, not a measurement; the five-run spread on the new set is
+next. The numbers are not comparable with the five-run table above, which
+was the old six-task set. And DeepSeek hit the 30-minute request cap on five
+tasks, all counted as failures; a run with a longer cap is pending.</p>
+<p>What one run does suggest: on the bigger set the order at the top flips,
+gpt-oss-120b ahead of Qwen3.8-27B, with DeepSeek close behind despite the
+timeouts. The bottom does not move. Tokens per second still ranks the field
+backwards: the two fastest generators, at 96 and 88 tok/s, are last.</p>
 <h2>A first look, before the harness</h2>
 <p>The same one-line prompt, <em>write a Rust function that parses an ISO-8601
 date</em>, sent by hand to four models:</p>
