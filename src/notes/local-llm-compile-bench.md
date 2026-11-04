@@ -1,8 +1,8 @@
 ---
-title: Does the code compile? Five local models on a DGX Spark
+title: Does the code compile? Six local models on a DGX Spark
 date: 2026-10-27
 section: llm
-summary: Six programming tasks in Rust, C++, Python, Go, TypeScript and React, five open-weight models on one GB10 box, scored by compiler and tests instead of by eye.
+summary: 36 programming tasks in Rust, C++, Python, Go, TypeScript and React, six open-weight models on one GB10 box, five runs each, scored by compiler and tests instead of by eye.
 license: own
 draft: false
 ---
@@ -29,6 +29,7 @@ tests pass?
 | gpt-oss-120b | MXFP4 | 65 GB | Ollama |
 | Qwen3.6-35B-A3B ("qwopus36") | Q6 + MTP | ~30 GB | llama.cpp |
 | DeepSeek V4 Flash 0731 | UD-IQ2_XXS | 91 GB | llama.cpp |
+| Qwen3-Coder-Next 80B-A3B (from 2 November) | Q6_K | 62 GB | llama.cpp |
 
 ## Results
 
@@ -51,6 +52,58 @@ five. Qwen3.8-27B, second on that first run, is the most reliable model here.
 The Go task is the one that separates the field: every model is flaky on it,
 and it is the only task about concurrency.
 
+## Update, 4 November: five runs of 36 tasks, six models
+
+Five full runs of the 36-task set, 180 attempts per model, same box and
+settings: temperature 0.2, 32k completion tokens. A sixth model joined:
+Qwen3-Coder-Next, a mixture-of-experts model with 80B parameters, 3B of them
+active, trained for code.
+
+| Model | Compiles | Tests pass | Wall median | Wall-to-pass | tok/s |
+|---|---|---|---|---|---|
+| Qwen3.8-27B | 162/180 | 151/180 | 65 s | 76 s | 31 |
+| gpt-oss-120b | 162/180 | 149/180 | 25 s | 26 s | 41 |
+| DeepSeek V4 Flash | 124/180 | 118/180 | 175 s | 192 s | 16 |
+| Qwen3-Coder-Next | 133/180 | 101/180 | 9 s | 9 s | 49 |
+| Qwen3.6-35B-A3B | 118/180 | 100/180 | 29 s | 29 s | 95 |
+| Nemotron 3.5 Lightning | 97/180 | 79/180 | 74 s | 63 s | 88 |
+
+Tests passed by language, out of 30 (six tasks, five runs):
+
+| Model | C++ | Go | Python | React | Rust | TypeScript |
+|---|---|---|---|---|---|---|
+| Qwen3.8-27B | 26 | 26 | 25 | 28 | 21 | 25 |
+| gpt-oss-120b | 27 | 24 | 26 | 23 | 24 | 25 |
+| DeepSeek V4 Flash | 30 | 21 | 21 | 20 | 16 | 10 |
+| Qwen3-Coder-Next | 23 | 11 | 21 | 20 | 10 | 16 |
+| Qwen3.6-35B-A3B | 20 | 12 | 21 | 22 | 11 | 14 |
+| Nemotron 3.5 Lightning | 25 | 6 | 22 | 14 | 6 | 6 |
+
+What the five runs say:
+
+- **The top is a tie.** The single run of 30 October put gpt-oss-120b ahead;
+  five runs put Qwen3.8-27B two attempts ahead out of 180. That is noise. It
+  is the same reversal as on the six-task set: report the spread.
+- **gpt-oss-120b is still the one to keep loaded.** Same pass rate, three
+  times faster to a passing answer, and the best Rust in the field (24 of 30).
+  Qwen3.8-27B is the most even across languages.
+- **A coder-trained model did not rescue the 3B-active class.**
+  Qwen3-Coder-Next passed 101, the general Qwen3.6-35B-A3B 100, and both stay
+  weak in Go (11 and 12 of 30) and Rust (10 and 11). After one run I thought
+  the coder model was better at Rust; five runs say it is not. What it does
+  have is time to an answer: 9 s, because it answers without reasoning first.
+- **DeepSeek V4 Flash is a lower bound, and part of the gap is mine.** In
+  run 1 its server was not reachable for 19 attempts: that is the box, not the
+  model. Without them it passed 118 of 161. A mistake in my local config left
+  its request cap at 1800 s instead of 2700 s, which cost 9 more attempts, and
+  it ran out of the 32k token budget 19 times. Its C++ was perfect, 30 of 30;
+  its TypeScript was the worst in the field, 10 of 30.
+- **Tokens per second still ranks the field backwards at the ends.** The two
+  fastest generators, at 95 and 88 tok/s, finish fifth and last.
+
+Raw CSVs and the per-task flaky list are in the repository under
+[results/gb10](https://github.com/cryply/llm-compile-bench/tree/main/results/gb10).
+
 ## Update, 30 October: 36 tasks
 
 The task set grew from 6 to 36: six per language instead of one. The harness
@@ -59,7 +112,8 @@ its real wall time instead of dying; two tasks had their tests fixed (one
 test contradicted its own prompt, one tested inputs the prompt never
 promised).
 
-One run of the new set so far, same box, same settings:
+Superseded by the five-run update above; kept for the record. One run of the
+new set, same box, same settings:
 
 | Model | Compiles | Tests pass | Wall median | Wall min..max | Wall-to-pass | tok/s |
 |---|---|---|---|---|---|---|
@@ -98,15 +152,16 @@ its answer stopped compiling. Thinking is where its quality comes from.
 ## Takeaways
 
 **Tokens per second ranks the models backwards.** The two fastest generators,
-Qwen3.6 at 95 tok/s and Nemotron at 86, pass about half the attempts. The two
-slowest-by-token models are the two most reliable. If you only benchmark
+Qwen3.6 at 95 tok/s and Nemotron at 86, pass about half the attempts
+(56 and 44 percent over five runs of the 36-task set). The slower
+generators are the reliable ones. If you only benchmark
 throughput, you install the wrong model.
 
-**Qwen3.8-27B is the quality pick, gpt-oss-120b the balance pick.** 28 of 30
-at 17 GB on disk, leaving room for a second model next to it. gpt-oss is twice
-as fast to a passing answer (27 s against 57 s) at 26 of 30, and it is the one
-I would leave loaded for daily work, as long as the task is not concurrency
-in Go.
+**Qwen3.8-27B is the quality pick, gpt-oss-120b the balance pick.** On the
+36-task set they are level, 151 and 149 of 180. Qwen3.8 does it at 17 GB on
+disk, leaving room for a second model next to it, and is the most even across
+languages. gpt-oss is three times as fast to a passing answer (26 s against
+76 s), and it is the one I would leave loaded for daily work.
 
 **DeepSeek V4 Flash is the strongest reasoner and the worst daily driver.**
 It solves what the others cannot, at five to ten times the wait, and its
@@ -115,7 +170,7 @@ gap between the other models. Capping its reasoning makes it fast and wrong.
 
 **The small MoE models fail on Rust and Go specifically.** Python, TypeScript
 and React mostly pass; the type system and the concurrency model are where
-they come apart.
+they come apart. Training one for code did not change that.
 
 **Half of the first run's failures were mine, not the models'.** Missing
 toolchains on the box (every Rust, Go and TypeScript task would have scored
@@ -125,4 +180,5 @@ same scepticism as the models it judges; a preflight check that the judges
 exist is now the first thing the script does.
 
 **One run is not a measurement.** The single run had gpt-oss at 6/6 and Qwen
-3.8 second. Five runs reversed them. Report the spread, not the mean.
+3.8 second. Five runs reversed them. On the 36-task set it happened again.
+Report the spread, not the mean.
