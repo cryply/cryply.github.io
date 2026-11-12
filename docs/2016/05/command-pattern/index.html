@@ -12,7 +12,7 @@
 <nav class="back"><a href="../../../">← Index</a></nav>
 <article>
 <h1>Command pattern</h1>
-<p class="meta">Originally published 2016-05-04 · Boris Ivanov</p>
+<p class="meta">Originally published 2016-05-04 · <a href="mailto:boris.ivanov@gmail.com">Boris Ivanov</a></p>
 <h3>1. Usage</h3>
 <p>Encapsulate a request as an object, thereby letting you parameterize clients with different requests, queue or log requests, and support undoable operations.</p>
 <p>The purpose of the Command pattern is to decouple an event generator (the Invoker) from the event handler (the Receiver).  A ConcreteCommand class (sub-classed from Command) defines an execute ()method which calls the appropriate method on the Receiver (the action method).  The client is responsible for associating the Receiver with the Command and then the Command with an Invoker. <br />

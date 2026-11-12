@@ -68,6 +68,9 @@ import sys
 import urllib.parse
 
 SITE_TITLE = "Boris Ivanov"
+# Подпись автора под заголовком статьи — ссылка на почту, чтобы читатели могли написать.
+AUTHOR_EMAIL = "boris.ivanov@gmail.com"
+AUTHOR_LINK = f'<a href="mailto:{AUTHOR_EMAIL}">Boris Ivanov</a>'
 SITE_SUB = "Notes on C++, FPGA and security — an archive, 2015–2016"
 CNAME = "borisivanov.com"
 LANG = {"c": "cpp", "cpp": "cpp", "c++": "cpp", "vhdl": "vhdl",
@@ -477,7 +480,7 @@ def main() -> int:
         content = (f'<nav class="back"><a href="{up}">← Index</a></nav>\n'
                    f'<article>\n<h1>{esc(p["post_title"])}</h1>\n'
                    f'<p class="meta">Originally published {date[:10]} · '
-                   f"Boris Ivanov</p>\n{body}\n</article>{cm_html}")
+                   f"{AUTHOR_LINK}</p>\n{body}\n</article>{cm_html}")
 
         d = os.path.join(a.out, y, mth, slug)
         os.makedirs(d, exist_ok=True)
@@ -499,7 +502,7 @@ def main() -> int:
         lic = LIC_MIXED if n["license"] == "mixed" else LIC_OWN
         content = (f'<nav class="back"><a href="{up}">← Index</a></nav>\n'
                    f'<article>\n<h1>{esc(n["title"])}</h1>\n'
-                   f'<p class="meta">{n["date"][:10]} · Boris Ivanov</p>\n'
+                   f'<p class="meta">{n["date"][:10]} · {AUTHOR_LINK}</p>\n'
                    f'{n["html"]}\n</article>')
         d = os.path.join(a.out, "notes", n["slug"])
         if os.path.isdir(n["assets"]) and os.path.realpath(n["assets"]) == os.path.realpath(d):
