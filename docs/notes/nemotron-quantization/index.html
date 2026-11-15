@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What does quantization cost a local coding model? Seven quants of one model · Boris Ivanov</title>
+<meta name="description" content="One model, seven quantizations from 2.5 to 8 bits, two engines, 36 coding tasks scored by compiler and tests. Below 4 bits the model breaks; between 4 and 8 bits run-to-run noise is as large as the difference.">
+<meta name="author" content="Boris Ivanov">
+<link rel="stylesheet" href="../../style.css?v=b1034d82">
+</head>
+<body>
+<nav class="back"><a href="../../">← Index</a></nav>
+<article>
+<h1>What does quantization cost a local coding model? Seven quants of one model</h1>
+<p class="meta">2026-11-15 · <a href="mailto:boris.ivanov@gmail.com">Boris Ivanov</a></p>
+<p>The usual advice is "Q4 is fine, Q8 if you can afford it". I wanted a number
+for that. Same model, same box, same 36 tasks from
+<a href="https://github.com/cryply/llm-compile-bench">llm-compile-bench</a>; only the
+quantization changes. A task counts only if the code compiles and passes the
+hidden tests on the first try.</p>
+<h2>Setup</h2>
+<ul>
+<li>ASUS Ascent GX10 (NVIDIA GB10, 128 GB unified memory)</li>
+<li>Model: Nemotron 3.5 Lightning 30B-A3B, a mixture-of-experts model with 3B
+  active parameters. It is the weakest model of my
+  <a href="../local-llm-compile-bench/">first comparison</a>, but also one of the
+  fastest, which makes it the obvious candidate for a lower-bit quant.</li>
+<li>Quants: Q8_0, Q5_0, Q4_0, IQ4_NL, MXFP4, and two mixed 2-bit GGUFs
+  (2.47 and 2.97 bits per weight on average)</li>
+<li>Engines: <code>llama-server</code> (llama.cpp b11234) and Ollama 0.33.1.
+  Context 40960, temperature 0.2, nothing else tuned.</li>
+<li>36 tasks: six each in C++, Go, Python, React, Rust and TypeScript</li>
+</ul>
+<h2>Results: llama-server, four runs per quant</h2>
+<table>
+<thead>
+<tr>
+<th>Quant</th>
+<th>Run 1</th>
+<th>Run 2</th>
+<th>Run 3</th>
+<th>Run 4</th>
+<th>Mean (of 36)</th>
+<th>tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q8_0</td>
+<td>23</td>
+<td>19</td>
+<td>22</td>
+<td>19</td>
+<td><strong>20.8</strong></td>
+<td>56</td>
+</tr>
+<tr>
+<td>Q4_0</td>
+<td>17</td>
+<td>19</td>
+<td>17</td>
+<td>20</td>
+<td><strong>18.2</strong></td>
+<td>88</td>
+</tr>
+<tr>
+<td>MXFP4</td>
+<td>15</td>
+<td>18</td>
+<td>19</td>
+<td>21</td>
+<td><strong>18.2</strong></td>
+<td>69</td>
+</tr>
+<tr>
+<td>IQ4_NL</td>
+<td>15</td>
+<td>18</td>
+<td>17</td>
+<td>19</td>
+<td><strong>17.2</strong></td>
+<td>88</td>
+</tr>
+<tr>
+<td>Q5_0</td>
+<td>18</td>
+<td>15</td>
+<td>15</td>
+<td>18</td>
+<td><strong>16.5</strong></td>
+<td>78</td>
+</tr>
+<tr>
+<td>2.97 bpw</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>5</td>
+<td>100</td>
+</tr>
+<tr>
+<td>2.47 bpw</td>
+<td>5</td>
+<td></td>
+<td></td>
+<td></td>
+<td>5</td>
+<td>104</td>
+</tr>
+</tbody>
+</table>
+<p>The 2-bit quants ran once: at 5 of 36 there was nothing left to average.
+They compiled 12 and 7 times, so most of their code did not even build.</p>
+<h2>The same quants on Ollama</h2>
+<table>
+<thead>
+<tr>
+<th>Quant</th>
+<th>Runs</th>
+<th>Mean (of 36)</th>
+<th>tok/s</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q5_0</td>
+<td>17, 21, 21</td>
+<td>19.7</td>
+<td>77</td>
+</tr>
+<tr>
+<td>Q8_0</td>
+<td>22, 16, 19</td>
+<td>19.0</td>
+<td>55</td>
+</tr>
+<tr>
+<td>MXFP4</td>
+<td>15, 15, 18</td>
+<td>16.0</td>
+<td>69</td>
+</tr>
+<tr>
+<td>IQ4_NL</td>
+<td>7 runs, 14..18</td>
+<td>15.7</td>
+<td>88</td>
+</tr>
+<tr>
+<td>Q4_0</td>
+<td>16, 14, 16</td>
+<td>15.3</td>
+<td>88</td>
+</tr>
+</tbody>
+</table>
+<p>Ollama 0.33.1 failed on the 2-bit files with a tensor size error, which is why they only ran on <code>llama-server</code>.
+Speed is the same on both engines. One Ollama run was dropped: my Rust tutor was using a model on the same box
+at the same time.</p>
+<h2>Tests passed by language, llama-server</h2>
+<p>Four runs, six tasks per language, so out of 24:</p>
+<table>
+<thead>
+<tr>
+<th>Quant</th>
+<th>C++</th>
+<th>Go</th>
+<th>Python</th>
+<th>React</th>
+<th>Rust</th>
+<th>TypeScript</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Q8_0</td>
+<td>21</td>
+<td>11</td>
+<td>20</td>
+<td>13</td>
+<td>7</td>
+<td>11</td>
+</tr>
+<tr>
+<td>Q4_0</td>
+<td>17</td>
+<td>11</td>
+<td>20</td>
+<td>13</td>
+<td>4</td>
+<td>8</td>
+</tr>
+<tr>
+<td>MXFP4</td>
+<td>17</td>
+<td>9</td>
+<td>20</td>
+<td>15</td>
+<td>6</td>
+<td>6</td>
+</tr>
+<tr>
+<td>IQ4_NL</td>
+<td>21</td>
+<td>4</td>
+<td>18</td>
+<td>13</td>
+<td>4</td>
+<td>9</td>
+</tr>
+<tr>
+<td>Q5_0</td>
+<td>20</td>
+<td>7</td>
+<td>19</td>
+<td>8</td>
+<td>5</td>
+<td>7</td>
+</tr>
+</tbody>
+</table>
+<h2>What the numbers say</h2>
+<p><strong>Below 4 bits the model breaks.</strong> 5 of 36 against 17 to 21 for every quant
+from 4 bits up. This is the only result here that no amount of noise explains.</p>
+<p><strong>Between 4 and 8 bits, the noise is as large as the difference.</strong> The same
+MXFP4 file passed 15, 18, 19 and 21 tasks in four runs. Q8_0 is ahead of the
+4-bit quants by about 3 tasks, but that is not significant at four runs
+(Welch's t-test, p = 0.06). Q5_0 came out last on <code>llama-server</code> and first on
+Ollama. If the ranking flips when you change the engine, one run per quant
+tells you nothing about the quant.</p>
+<p><strong>Q4_0 is the practical pick.</strong> About 88 % of Q8_0's pass rate at 1.6 times
+the speed. MXFP4 matches its pass
+rate but is slower on this box.</p>
+<p><strong>Rust is the hardest language for this model at every quant.</strong> 4 to 7 of 24
+in Rust, against 17 to 21 in C++ and 18 to 20 in Python. Quantization does not
+explain it: Q8_0 is barely better. My guess is that a model with 3B active
+parameters does not have room for the borrow checker; the bigger models of the
+first comparison did much better here.</p>
+<p><strong>The engine matters a little, the runs matter more.</strong> The 4-bit quants
+averaged 15.7 on Ollama and 17.9 on <code>llama-server</code>. The two engines use
+different default sampling settings; I only fixed the temperature. That
+difference is smaller than the spread of a single quant across runs.</p>
+<h2>Caveats</h2>
+<ul>
+<li>Four runs per quant on one engine, three on the other. Enough to see the
+  2-bit cliff and to see that the rest is noise; not enough to rank 4-bit
+  formats against each other.</li>
+<li>One model. A dense model, or one with more active parameters, may lose more
+  or less from the same quantization.</li>
+<li>Only temperature was fixed. Top-p, min-p and repeat penalty were left at
+  each engine's defaults.</li>
+</ul>
+<p>Raw CSVs are in the repository under
+<a href="https://github.com/cryply/llm-compile-bench/tree/main/results/gb10">results/gb10</a>.</p>
+</article>
+<footer class="site">© 2026 Boris Ivanov. Entirely my own work — text, code and screenshots. Reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>.</footer>
+</body>
+</html>
