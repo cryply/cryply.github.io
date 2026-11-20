@@ -32,7 +32,11 @@ someone else. A "no logs" service can log. Any of these services could even be
 a honeypot, built to collect exactly the questions people do not want to ask
 elsewhere. I have no evidence that any of them is, but from the outside you
 cannot rule it out. Only a local model on your own hardware can guarantee
-privacy. Everything below is a trade: less privacy for more model.</p>
+privacy, and even that only if the machine is offline. Inference servers and
+their Python or Node.js dependencies can send telemetry or update themselves,
+and "safe" packages in public repositories have been hijacked before. For
+real privacy, run the model on an air-gapped box, or at least block all of its
+outgoing traffic. Everything below is a trade: less privacy for more model.</p>
 <p>I have not benchmarked the services or the models below. Prices and privacy
 statements are taken from the providers' own pages on 20 November 2026, unless
 I say otherwise. Check them before you pay.</p>
@@ -339,6 +343,28 @@ and less on spot. Count the download too: 455 GB takes about an hour at
   International takes normal cards, but its big-cloud prices are higher.</li>
 <li>Your prompts and files sit under Chinese jurisdiction.</li>
 </ul>
+<h3>Other hardware you can rent</h3>
+<ul>
+<li><strong>A large CPU node.</strong> Plenty of RAM instead of GPU memory. For example, AWS
+  <code>r5.24xlarge</code> has 96 vCPUs and 768 GiB of RAM, enough for the 455 GB GLM 5.3
+  file. Spot prices for such instances can be very low in some regions; check
+  the <a href="https://aws.amazon.com/ec2/spot/pricing/">spot pricing page</a>. Expect it
+  to be much slower than GPUs, because every token has to read the weights from
+  ordinary RAM. Mixture-of-experts models suffer less, since they read only a
+  part of the weights per token. I have not measured it.</li>
+<li><strong>Dedicated LLM hosting.</strong> For example <a href="https://hostkey.com/apps/llms/">HOSTKEY</a>:
+  GPU servers with Ollama and Open WebUI pre-installed, models up to
+  gpt-oss:120b, from 0.624 EUR per hour (RTX 5090) or 299 EUR per month
+  (RTX 4090). Locations named on the page: the Netherlands, the USA and
+  Russia. The page says nothing about logging. Easy to start, but it is the
+  provider's setup, not yours, so assume some tracking.</li>
+<li><strong>The big clouds</strong> (AWS, Google Cloud, Azure): mature and reliable, but
+  GPU instances on demand are the most expensive; spot is cheaper. See
+  <a href="https://aws.amazon.com/ec2/pricing/on-demand/">AWS on-demand pricing</a>.</li>
+<li><strong>Ordinary web hosting, VPS or dedicated servers</strong>: technically possible,
+  but many hosters treat sustained heavy compute as abuse, even on your own
+  dedicated machine. Read the terms first.</li>
+</ul>
 <h3>Is a rented node private?</h3>
 <p>More than a chat service, less than your own box. Nobody logs your prompts by
 design, but the provider owns the machine and can technically look inside. On
@@ -366,7 +392,11 @@ and its disk when you are done.</p>
 <li><a href="https://vps.fund/article/l40s-gpu-cloud-pricing-comparison-20260602">vps.fund: H200 cloud price comparison</a></li>
 <li><a href="https://rentgpu.link/en/china">rentgpu.link: GPU prices on Chinese platforms</a></li>
 <li><a href="https://www.promptquorum.com/local-llms/alibaba-cloud-vs-tencent-cloud-gpu-ai-2026">PromptQuorum: AutoDL, Alibaba and Tencent GPU pricing</a></li>
+<li><a href="https://hostkey.com/apps/llms/">HOSTKEY: LLM hosting</a></li>
+<li><a href="https://aws.amazon.com/ec2/pricing/on-demand/">AWS EC2 on-demand pricing</a>, <a href="https://aws.amazon.com/ec2/spot/pricing/">AWS EC2 spot pricing</a></li>
 </ul>
+<p>Thanks to a friend for the review: the air gap, the CPU option and the list of
+hosting types are his.</p>
 </article>
 <footer class="site">© 2026 Boris Ivanov. Entirely my own work — text, code and screenshots. Reuse with attribution under <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC&nbsp;BY&nbsp;4.0</a>.</footer>
 </body>

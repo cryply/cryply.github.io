@@ -27,7 +27,11 @@ someone else. A "no logs" service can log. Any of these services could even be
 a honeypot, built to collect exactly the questions people do not want to ask
 elsewhere. I have no evidence that any of them is, but from the outside you
 cannot rule it out. Only a local model on your own hardware can guarantee
-privacy. Everything below is a trade: less privacy for more model.
+privacy, and even that only if the machine is offline. Inference servers and
+their Python or Node.js dependencies can send telemetry or update themselves,
+and "safe" packages in public repositories have been hijacked before. For
+real privacy, run the model on an air-gapped box, or at least block all of its
+outgoing traffic. Everything below is a trade: less privacy for more model.
 
 I have not benchmarked the services or the models below. Prices and privacy
 statements are taken from the providers' own pages on 20 November 2026, unless
@@ -166,6 +170,28 @@ Notes on China:
   International takes normal cards, but its big-cloud prices are higher.
 - Your prompts and files sit under Chinese jurisdiction.
 
+### Other hardware you can rent
+
+- **A large CPU node.** Plenty of RAM instead of GPU memory. For example, AWS
+  `r5.24xlarge` has 96 vCPUs and 768 GiB of RAM, enough for the 455 GB GLM 5.3
+  file. Spot prices for such instances can be very low in some regions; check
+  the [spot pricing page](https://aws.amazon.com/ec2/spot/pricing/). Expect it
+  to be much slower than GPUs, because every token has to read the weights from
+  ordinary RAM. Mixture-of-experts models suffer less, since they read only a
+  part of the weights per token. I have not measured it.
+- **Dedicated LLM hosting.** For example [HOSTKEY](https://hostkey.com/apps/llms/):
+  GPU servers with Ollama and Open WebUI pre-installed, models up to
+  gpt-oss:120b, from 0.624 EUR per hour (RTX 5090) or 299 EUR per month
+  (RTX 4090). Locations named on the page: the Netherlands, the USA and
+  Russia. The page says nothing about logging. Easy to start, but it is the
+  provider's setup, not yours, so assume some tracking.
+- **The big clouds** (AWS, Google Cloud, Azure): mature and reliable, but
+  GPU instances on demand are the most expensive; spot is cheaper. See
+  [AWS on-demand pricing](https://aws.amazon.com/ec2/pricing/on-demand/).
+- **Ordinary web hosting, VPS or dedicated servers**: technically possible,
+  but many hosters treat sustained heavy compute as abuse, even on your own
+  dedicated machine. Read the terms first.
+
 ### Is a rented node private?
 
 More than a chat service, less than your own box. Nobody logs your prompts by
@@ -195,3 +221,8 @@ and its disk when you are done.
 - [vps.fund: H200 cloud price comparison](https://vps.fund/article/l40s-gpu-cloud-pricing-comparison-20260602)
 - [rentgpu.link: GPU prices on Chinese platforms](https://rentgpu.link/en/china)
 - [PromptQuorum: AutoDL, Alibaba and Tencent GPU pricing](https://www.promptquorum.com/local-llms/alibaba-cloud-vs-tencent-cloud-gpu-ai-2026)
+- [HOSTKEY: LLM hosting](https://hostkey.com/apps/llms/)
+- [AWS EC2 on-demand pricing](https://aws.amazon.com/ec2/pricing/on-demand/), [AWS EC2 spot pricing](https://aws.amazon.com/ec2/spot/pricing/)
+
+Thanks to a friend for the review: the air gap, the CPU option and the list of
+hosting types are his.
