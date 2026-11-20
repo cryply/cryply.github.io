@@ -6,7 +6,7 @@
 <title>lurecheck: check a job offer before you run its take-home task · Boris Ivanov</title>
 <meta name="description" content="A small open-source Rust tool for developers who are looking for a job. It checks how old a company&#x27;s domain is and scans a take-home repository for code that runs by itself, without executing anything.">
 <meta name="author" content="Boris Ivanov">
-<link rel="stylesheet" href="../../style.css?v=b1034d82">
+<link rel="stylesheet" href="../../style.css?v=32cc0db6">
 </head>
 <body>
 <nav class="back"><a href="../../">← Index</a></nav>
@@ -28,13 +28,13 @@ written in Rust.</p>
 <li><strong>the take-home repository</strong>: a static scan. Nothing from the repository is
   executed.</li>
 </ul>
-<h2>Install</h2>
+<h2 id="install">Install</h2>
 <p>You need a recent stable Rust (1.88 or newer).</p>
 <pre><code>git clone https://github.com/cryply/lurecheck
 cd lurecheck
 cargo install --path .
 </code></pre>
-<h2>Check a company</h2>
+<h2 id="check-a-company">Check a company</h2>
 <pre><code>lurecheck domain new-company.example
 </code></pre>
 <p>It also accepts a URL or an e-mail address. The output looks like this (the
@@ -95,7 +95,7 @@ DANGER: do not engage with this company
 </table>
 <p>The VirusTotal lookup is optional. Set <code>VT_API_KEY</code> to a free key to turn it
 on.</p>
-<h2>Check a take-home repository</h2>
+<h2 id="check-a-take-home-repository">Check a take-home repository</h2>
 <p>Do this <strong>before</strong> you open the folder in an editor.</p>
 <pre><code>lurecheck repo owner/name        # a GitHub repository
 lurecheck repo ./take-home       # a local folder
@@ -174,7 +174,7 @@ DANGER: do not run this code
 </tr>
 </tbody>
 </table>
-<h2>Use it in scripts</h2>
+<h2 id="use-it-in-scripts">Use it in scripts</h2>
 <p>The exit code tells the result: 0 clean, 1 suspicious, 2 danger, 3 error.
 With <code>--json</code> the output is machine-readable.</p>
 <p>I use it this way in my own job-alert script: every new listing has its
@@ -182,7 +182,7 @@ company site checked, and suspicious ones get a mark in the report. So far it
 has flagged three "companies" whose sites were 9, 33 and 40 days old.</p>
 <p>Results are cached in <code>~/.cache/lurecheck/</code>: domain facts for 7 days,
 repository scans by exact content. <code>--fresh</code> ignores the cache.</p>
-<h2>Limits</h2>
+<h2 id="limits">Limits</h2>
 <ul>
 <li><strong>Clean is not a guarantee.</strong> These are simple static rules. New tricks will
   pass. A danger result is a reason to stop and look; a clean result is not a
@@ -196,7 +196,7 @@ repository scans by exact content. <code>--fresh</code> ignores the cache.</p>
   container, with no access to your real home folder. And do not click
   "Trust this folder" in VS Code for code from strangers.</li>
 </ul>
-<h2>What is next</h2>
+<h2 id="what-is-next">What is next</h2>
 <ul>
 <li>A browser extension with the same rules, so the warning shows up on the job
   page and on the GitHub repository page.</li>

@@ -6,7 +6,7 @@
 <title>Does the code compile? Six local models on a DGX Spark · Boris Ivanov</title>
 <meta name="description" content="36 programming tasks in Rust, C++, Python, Go, TypeScript and React, six open-weight models on one GB10 box, five runs each, scored by compiler and tests instead of by eye.">
 <meta name="author" content="Boris Ivanov">
-<link rel="stylesheet" href="../../style.css?v=b1034d82">
+<link rel="stylesheet" href="../../style.css?v=32cc0db6">
 </head>
 <body>
 <nav class="back"><a href="../../">← Index</a></nav>
@@ -17,7 +17,7 @@
 <em>how fast</em>, not <em>which model to install</em>. For a developer the second question
 reduces to something a machine can check: does the code compile, and do the
 tests pass?</p>
-<h2>Setup</h2>
+<h2 id="setup">Setup</h2>
 <ul>
 <li>ASUS Ascent GX10 (NVIDIA GB10, 128 GB unified memory)</li>
 <li>Ollama for models that fit side by side, <code>llama-server</code> (llama.cpp) for the rest</li>
@@ -25,7 +25,7 @@ tests pass?</p>
   language with a fixed signature, hidden tests, <code>cargo</code> / <code>g++</code> / <code>pytest</code> /
   <code>go test</code> / <code>tsc</code> as judges</li>
 </ul>
-<h2>Models</h2>
+<h2 id="models">Models</h2>
 <table>
 <thead>
 <tr>
@@ -74,7 +74,7 @@ tests pass?</p>
 </tr>
 </tbody>
 </table>
-<h2>Results</h2>
+<h2 id="results">Results</h2>
 <p>Six tasks, five runs per model (30 attempts each), temperature 0.2, 32k
 completion tokens. "Wall-to-pass" is the average time over the attempts that
 passed: the number that matters when you are waiting for a usable answer.
@@ -150,7 +150,7 @@ looked like the clear winner. Over five runs its Go worker pool passed once in
 five. Qwen3.8-27B, second on that first run, is the most reliable model here.
 The Go task is the one that separates the field: every model is flaky on it,
 and it is the only task about concurrency.</p>
-<h2>Update, 4 November: five runs of 36 tasks, six models</h2>
+<h2 id="update-4-november-five-runs-of-36-tasks-six-models">Update, 4 November: five runs of 36 tasks, six models</h2>
 <p>Five full runs of the 36-task set, 180 attempts per model, same box and
 settings: temperature 0.2, 32k completion tokens. A sixth model joined:
 Qwen3-Coder-Next, a mixture-of-experts model with 80B parameters, 3B of them
@@ -311,7 +311,7 @@ active, trained for code.</p>
 </ul>
 <p>Raw CSVs and the per-task flaky list are in the repository under
 <a href="https://github.com/cryply/llm-compile-bench/tree/main/results/gb10">results/gb10</a>.</p>
-<h2>Update, 30 October: 36 tasks</h2>
+<h2 id="update-30-october-36-tasks">Update, 30 October: 36 tasks</h2>
 <p>The task set grew from 6 to 36: six per language instead of one. The harness
 learned per-model request timeouts and now records a timed-out request with
 its real wall time instead of dying; two tasks had their tests fixed (one
@@ -388,7 +388,7 @@ tasks, all counted as failures; a run with a longer cap is pending.</p>
 gpt-oss-120b ahead of Qwen3.8-27B, with DeepSeek close behind despite the
 timeouts. The bottom does not move. Tokens per second still ranks the field
 backwards: the two fastest generators, at 96 and 88 tok/s, are last.</p>
-<h2>A first look, before the harness</h2>
+<h2 id="a-first-look-before-the-harness">A first look, before the harness</h2>
 <p>The same one-line prompt, <em>write a Rust function that parses an ISO-8601
 date</em>, sent by hand to four models:</p>
 <pre><code class="language-text">Nemotron 3.5 Lightning   93 tok/s    27 s   answered in English, date-only
@@ -398,7 +398,7 @@ DeepSeek V4 Flash        17 tok/s   659 s   best code, 11k tokens of thinking
 </code></pre>
 <p>Capping DeepSeek's reasoning at 2048 tokens made it four times faster, and
 its answer stopped compiling. Thinking is where its quality comes from.</p>
-<h2>Takeaways</h2>
+<h2 id="takeaways">Takeaways</h2>
 <p><strong>Tokens per second ranks the models backwards.</strong> The two fastest generators,
 Qwen3.6 at 95 tok/s and Nemotron at 86, pass about half the attempts
 (56 and 44 percent over five runs of the 36-task set). The slower

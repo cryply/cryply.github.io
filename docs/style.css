@@ -59,3 +59,7 @@ article th, article td { border-bottom:1px solid var(--line); padding:.35rem .7r
 article th { color:var(--muted); font-weight:normal;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 article td.num, article th.num { text-align:right; font-variant-numeric:tabular-nums; }
+nav.toc { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:.6rem 1.1rem; margin:0 0 2rem; font-size:.95rem; }
+nav.toc ul { margin:.2rem 0; padding-left:1.2rem; }
+p.totop { font-size:.85rem; margin:2.2rem 0 0; text-align:right; }

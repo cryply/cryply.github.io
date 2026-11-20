@@ -6,7 +6,7 @@
 <title>What does quantization cost a local coding model? Seven quants of one model · Boris Ivanov</title>
 <meta name="description" content="One model, seven quantizations from 2.5 to 8 bits, two engines, 36 coding tasks scored by compiler and tests. Below 4 bits the model breaks; between 4 and 8 bits run-to-run noise is as large as the difference.">
 <meta name="author" content="Boris Ivanov">
-<link rel="stylesheet" href="../../style.css?v=b1034d82">
+<link rel="stylesheet" href="../../style.css?v=32cc0db6">
 </head>
 <body>
 <nav class="back"><a href="../../">← Index</a></nav>
@@ -18,7 +18,7 @@ for that. Same model, same box, same 36 tasks from
 <a href="https://github.com/cryply/llm-compile-bench">llm-compile-bench</a>; only the
 quantization changes. A task counts only if the code compiles and passes the
 hidden tests on the first try.</p>
-<h2>Setup</h2>
+<h2 id="setup">Setup</h2>
 <ul>
 <li>ASUS Ascent GX10 (NVIDIA GB10, 128 GB unified memory)</li>
 <li>Model: Nemotron 3.5 Lightning 30B-A3B, a mixture-of-experts model with 3B
@@ -31,7 +31,7 @@ hidden tests on the first try.</p>
   Context 40960, temperature 0.2, nothing else tuned.</li>
 <li>36 tasks: six each in C++, Go, Python, React, Rust and TypeScript</li>
 </ul>
-<h2>Results: llama-server, four runs per quant</h2>
+<h2 id="results-llama-server-four-runs-per-quant">Results: llama-server, four runs per quant</h2>
 <table>
 <thead>
 <tr>
@@ -112,7 +112,7 @@ hidden tests on the first try.</p>
 </table>
 <p>The 2-bit quants ran once: at 5 of 36 there was nothing left to average.
 They compiled 12 and 7 times, so most of their code did not even build.</p>
-<h2>The same quants on Ollama</h2>
+<h2 id="the-same-quants-on-ollama">The same quants on Ollama</h2>
 <table>
 <thead>
 <tr>
@@ -158,7 +158,7 @@ They compiled 12 and 7 times, so most of their code did not even build.</p>
 <p>Ollama 0.33.1 failed on the 2-bit files with a tensor size error, which is why they only ran on <code>llama-server</code>.
 Speed is the same on both engines. One Ollama run was dropped: my Rust tutor was using a model on the same box
 at the same time.</p>
-<h2>Tests passed by language, llama-server</h2>
+<h2 id="tests-passed-by-language-llama-server">Tests passed by language, llama-server</h2>
 <p>Four runs, six tasks per language, so out of 24:</p>
 <table>
 <thead>
@@ -220,7 +220,7 @@ at the same time.</p>
 </tr>
 </tbody>
 </table>
-<h2>What the numbers say</h2>
+<h2 id="what-the-numbers-say">What the numbers say</h2>
 <p><strong>Below 4 bits the model breaks.</strong> 5 of 36 against 17 to 21 for every quant
 from 4 bits up. This is the only result here that no amount of noise explains.</p>
 <p><strong>Between 4 and 8 bits, the noise is as large as the difference.</strong> The same
@@ -241,7 +241,7 @@ first comparison did much better here.</p>
 averaged 15.7 on Ollama and 17.9 on <code>llama-server</code>. The two engines use
 different default sampling settings; I only fixed the temperature. That
 difference is smaller than the spread of a single quant across runs.</p>
-<h2>Caveats</h2>
+<h2 id="caveats">Caveats</h2>
 <ul>
 <li>Four runs per quant on one engine, three on the other. Enough to see the
   2-bit cliff and to see that the rest is noise; not enough to rank 4-bit
