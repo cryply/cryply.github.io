@@ -224,5 +224,5 @@ and its disk when you are done.
 - [HOSTKEY: LLM hosting](https://hostkey.com/apps/llms/)
 - [AWS EC2 on-demand pricing](https://aws.amazon.com/ec2/pricing/on-demand/), [AWS EC2 spot pricing](https://aws.amazon.com/ec2/spot/pricing/)
 
-Thanks to a friend for the review: the air gap, the CPU option and the list of
+Thanks to Shelwien for the review: the air gap, the CPU option and the list of
 hosting types are his.
