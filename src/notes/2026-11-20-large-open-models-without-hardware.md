@@ -1,8 +1,8 @@
 ---
-title: Uncensored models, non-local: hosted services and rented GPUs
+title: "Large open models without your own hardware: what privacy you really get"
 date: 2026-11-20
 section: llm
-summary: Two ways to try a large uncensored model without owning the hardware. Use a hosted service that does not keep your prompts, or rent a GPU node for a few hours and run the weights yourself. Services, five models, and GPU prices, as of 20 November 2026.
+summary: "Two ways to run a large open model, including uncensored ones, without owning the hardware: a hosted service or a rented GPU node. What each costs, and why only a local model gives real privacy. Services, five models and GPU prices as of 20 November 2026."
 license: own
 draft: false
 ---

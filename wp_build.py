@@ -86,7 +86,9 @@ SECTIONS = [
     ("C++ design patterns", "programming",
      "A run through the Gang of Four catalogue: what each pattern is for, "
      "a diagram, trade-offs, and working C++."),
-    ("Security", "security", "Cryptography, worked through by hand."),
+    ("Security", "security",
+     "Cryptography worked through by hand, and tools against scams aimed at "
+     "developers."),
     ("Other", None, ""),
 ]
 
