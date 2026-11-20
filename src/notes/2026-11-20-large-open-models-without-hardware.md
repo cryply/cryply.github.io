@@ -18,8 +18,10 @@ do not fit on a home machine. My GB10 box has about 121 GiB of usable memory,
 and the models below need 300 to 600 GB. So this note is about the non-local
 options. There are two:
 
-1. A hosted service that already runs uncensored models.
-2. A rented GPU node, where you run the weights yourself.
+1. [A hosted service](#option-1-hosted-services) that already runs uncensored
+   models.
+2. [A rented GPU node](#option-2-rent-a-gpu-node-and-run-the-weights-yourself),
+   where you run the weights yourself.
 
 One thing first, so nobody reads this the wrong way: **privacy in both
 options is conditional.** You send your prompts to a machine that belongs to
@@ -36,6 +38,10 @@ outgoing traffic. Everything below is a trade: less privacy for more model.
 I have not benchmarked the services or the models below. Prices and privacy
 statements are taken from the providers' own pages on 20 November 2026, unless
 I say otherwise. Check them before you pay.
+
+**Contents**
+
+[TOC]
 
 ## What "uncensored" means here
 

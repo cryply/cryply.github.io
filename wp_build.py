@@ -173,6 +173,10 @@ article th, article td { border-bottom:1px solid var(--line); padding:.35rem .7r
 article th { color:var(--muted); font-weight:normal;
   font-family:ui-monospace,SFMono-Regular,Menlo,monospace; }
 article td.num, article th.num { text-align:right; font-variant-numeric:tabular-nums; }
+nav.toc { background:var(--code-bg); border:1px solid var(--line); border-radius:4px;
+  padding:.6rem 1.1rem; margin:0 0 2rem; font-size:.95rem; }
+nav.toc ul { margin:.2rem 0; padding-left:1.2rem; }
+p.totop { font-size:.85rem; margin:2.2rem 0 0; text-align:right; }
 """
 
 PAGE = """<!doctype html>
@@ -370,8 +374,24 @@ def load_notes(notes_dir: str, drafts: bool) -> list[dict]:
             print(f"  {fn}: черновик — пропускаю (--drafts, чтобы включить)")
             continue
         slug = meta.get("slug") or re.sub(r"^\d{4}-\d{2}(-\d{2})?-", "", fn[:-3])
-        body = markdown.markdown(m.group(2), extensions=["fenced_code", "tables"],
+        # toc: headings get ids, so a note can link to its own sections and
+        # put [TOC] where a table of contents should go.
+        body = markdown.markdown(m.group(2),
+                                 extensions=["fenced_code", "tables", "toc"],
+                                 extension_configs={"toc": {"toc_depth": "2-3"}},
                                  output_format="html5")
+        # With a table of contents, every later h2 gets a link back to it.
+        if '<div class="toc">' in body:
+            body = body.replace('<div class="toc">',
+                                '<nav class="toc" id="contents">', 1)
+            body = re.sub(r'(<div class="toc">|<nav class="toc" id="contents">)'
+                          r'(.*?)</div>', r'\1\2</nav>', body, count=1, flags=re.S)
+            first = body.find("<h2 ")
+            if first != -1:
+                head, tail = body[:first + 1], body[first + 1:]
+                tail = tail.replace("<h2 ", '<p class="totop"><a href="#contents">'
+                                    'back to contents</a></p>\n<h2 ')
+                body = head + tail
         out.append({"title": meta["title"], "date": meta["date"], "slug": slug,
                     "section": meta.get("section", ""),
                     "summary": meta.get("summary", ""),
